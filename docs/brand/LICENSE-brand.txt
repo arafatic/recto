@@ -1,0 +1,39 @@
+# Recto Brand & Trademark Guidelines
+
+Hello! We love that people build upon, contribute to, and share Recto. 
+
+While the source code for Recto is open source under the MIT and Apache-2.0 licenses, the **Recto** and **Arafatic** names, logos, and brand assets are protected trademarks owned by the Arafatic Team. 
+
+This guide outlines how you can use our brand assets respectfully.
+
+---
+
+### Using Our Brand Assets
+
+You are welcome to use our official logos and brand marks:
+* Inside copies of this official repository.
+* Within official Recto builds and documentation to indicate that the software is created by the Arafatic Team.
+
+**Please keep these guidelines in mind:**
+* **Keep them original:** Please do not alter, stretch, re-color, crop, or animate the logos. Use the files directly as provided.
+* **No endorsement:** Do not use our name or logos in a way that suggests the Arafatic Team sponsors, endorses, or is officially affiliated with your personal project, service, or company.
+* **Keep distinct:** Please do not use "Arafatic" or "Recto" as the primary name of your own apps, domains, social media handles, or business entities.
+
+---
+
+### Creating Forks or Modified Builds
+
+One of the best parts of open source is the freedom to fork and experiment. If you publish or distribute a modified version of this software:
+
+1. **Brand it as your own:** Please replace our logos, app icons, and branding with your own unique name and artwork.
+2. **Do not call it Recto:** Give your project its own identity so users aren’t confused about which version is official.
+3. **Giving credit (optional & appreciated):** You are always welcome to state in plain text: *"Based on Recto by the Arafatic Team."*
+4. **Upstream contributions:** If you are simply maintaining a fork to submit pull requests back to us, you do not need to remove the branding.
+
+---
+
+### Questions or Special Requests?
+
+If you have a use case that isn’t covered here or want to collaborate, please reach out to the Arafatic Team.
+
+*All other rights reserved.*

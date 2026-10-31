@@ -1,0 +1,56 @@
+[package]
+name = "recto-engine"
+description = "Recto engine façade: session, documents, command/tool catalogue"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+craft-docpath = { workspace = true }
+recto-measure = { workspace = true }
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "tiff"] }
+recto-render = { workspace = true }
+recto-cos = { workspace = true }
+recto-organize = { workspace = true }
+recto-annot = { workspace = true }
+recto-forms = { workspace = true }
+recto-xfa = { workspace = true }
+recto-edit = { workspace = true }
+recto-audit = { workspace = true }
+recto-redact = { workspace = true }
+recto-print = { workspace = true }
+recto-xfdf = { workspace = true }
+recto-sign = { workspace = true }
+recto-optimize = { workspace = true }
+recto-a11y = { workspace = true }
+recto-ocr = { workspace = true }
+recto-js = { workspace = true }
+recto-compare = { workspace = true }
+recto-preflight = { workspace = true }
+recto-export = { workspace = true }
+recto-fonts = { workspace = true }
+recto-create = { workspace = true }
+recto-model = { workspace = true }
+recto-geom = { workspace = true }
+thiserror = { workspace = true }
+png = "0.18"
+# Already in the graph (through image and recto-create): image's TiffEncoder can't set the
+# resolution or the compression of an exported page.
+tiff = "0.11"
+# Already in the graph (url and idna through webbrowser, icu_properties through boa): they show
+# the host of a document's link the way the browser reads it (links::display_host).
+url = "2.5"
+idna = "1.1"
+icu_properties = "2.3"
+unicode-segmentation = "1.13"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+# Already in the graph through lopdf; used only for the local UTC offset ("today"). The workspace
+# entry is std-only; this target adds `clock` for `chrono::Local::now`.
+chrono = { workspace = true, features = ["clock"] }
+
+[dev-dependencies]
+recto-testkit = { workspace = true }

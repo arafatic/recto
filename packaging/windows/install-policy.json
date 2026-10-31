@@ -1,0 +1,329 @@
+{
+  "id": "recto",
+  "name": "Recto",
+  "upgradeCode": "FF3C761B-F699-5787-9C4D-13CBDF33A529",
+  "sources": [
+    "recto.wxs",
+    "installer-ui.wxs"
+  ],
+  "icon": "assets/app-icon/recto.ico",
+  "localization": [],
+  "extensions": [],
+  "payloads": [
+    "LICENSE-APACHE",
+    "LICENSE-MIT",
+    "LICENSE-document.txt",
+    "NOTICE",
+    "recto-cli.exe",
+    "recto.exe"
+  ],
+  "registry": [
+    [
+      "-1",
+      "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\recto.exe",
+      "",
+      "[#RectoExe]"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\recto.document",
+      "",
+      "PDF Document"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\recto.document\\DefaultIcon",
+      "",
+      "\"[#RectoExe]\",-2"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\recto.document\\shell\\open\\command",
+      "",
+      "\"[#RectoExe]\" \"%1\""
+    ],
+    [
+      "-1",
+      "Software\\Classes\\recto.document",
+      "TypeOverlay",
+      ""
+    ],
+    [
+      "-1",
+      "Software\\Classes\\.pdf\\OpenWithProgids",
+      "recto.document",
+      ""
+    ],
+    [
+      "-1",
+      "Software\\Classes\\Applications\\recto.exe",
+      "FriendlyAppName",
+      "Recto"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\Applications\\recto.exe\\DefaultIcon",
+      "",
+      "\"[#RectoExe]\",-2"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\Applications\\recto.exe\\SupportedTypes",
+      ".pdf",
+      ""
+    ],
+    [
+      "-1",
+      "Software\\Classes\\Applications\\recto.exe\\shell\\open\\command",
+      "",
+      "\"[#RectoExe]\" \"%1\""
+    ],
+    [
+      "-1",
+      "Software\\recto\\Capabilities",
+      "ApplicationName",
+      "Recto"
+    ],
+    [
+      "-1",
+      "Software\\recto\\Capabilities",
+      "ApplicationDescription",
+      "Open-source PDF workbench"
+    ],
+    [
+      "-1",
+      "Software\\recto\\Capabilities",
+      "ApplicationIcon",
+      "[#RectoExe],0"
+    ],
+    [
+      "-1",
+      "Software\\recto\\Capabilities\\FileAssociations",
+      ".pdf",
+      "recto.document"
+    ],
+    [
+      "-1",
+      "Software\\RegisteredApplications",
+      "recto",
+      "Software\\recto\\Capabilities"
+    ],
+    [
+      "-1",
+      "Software\\recto\\Shortcuts",
+      "StartMenu",
+      "#1"
+    ],
+    [
+      "-1",
+      "Software\\recto\\Shortcuts",
+      "Desktop",
+      "#1"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.pdf\\shell\\recto.edit",
+      "",
+      "Edit with Recto"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.pdf\\shell\\recto.edit",
+      "Icon",
+      "\"[#RectoExe]\",0"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.pdf\\shell\\recto.edit",
+      "MultiSelectModel",
+      "Document"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.pdf\\shell\\recto.edit\\command",
+      "",
+      "\"[#RectoExe]\" \"%1\""
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.png\\shell\\recto.createpdf",
+      "",
+      "Create PDF with Recto\u2026"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.png\\shell\\recto.createpdf",
+      "MultiSelectModel",
+      "Single"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.png\\shell\\recto.createpdf\\command",
+      "",
+      "\"[#RectoExe]\" --create-images \"%1\""
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.jpg\\shell\\recto.createpdf",
+      "",
+      "Create PDF with Recto\u2026"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.jpg\\shell\\recto.createpdf",
+      "MultiSelectModel",
+      "Single"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.jpg\\shell\\recto.createpdf\\command",
+      "",
+      "\"[#RectoExe]\" --create-images \"%1\""
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.jpeg\\shell\\recto.createpdf",
+      "",
+      "Create PDF with Recto\u2026"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.jpeg\\shell\\recto.createpdf",
+      "MultiSelectModel",
+      "Single"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.jpeg\\shell\\recto.createpdf\\command",
+      "",
+      "\"[#RectoExe]\" --create-images \"%1\""
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.tif\\shell\\recto.createpdf",
+      "",
+      "Create PDF with Recto\u2026"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.tif\\shell\\recto.createpdf",
+      "MultiSelectModel",
+      "Single"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.tif\\shell\\recto.createpdf\\command",
+      "",
+      "\"[#RectoExe]\" --create-images \"%1\""
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.tiff\\shell\\recto.createpdf",
+      "",
+      "Create PDF with Recto\u2026"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.tiff\\shell\\recto.createpdf",
+      "MultiSelectModel",
+      "Single"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.tiff\\shell\\recto.createpdf\\command",
+      "",
+      "\"[#RectoExe]\" --create-images \"%1\""
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.gif\\shell\\recto.createpdf",
+      "",
+      "Create PDF with Recto\u2026"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.gif\\shell\\recto.createpdf",
+      "MultiSelectModel",
+      "Single"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.gif\\shell\\recto.createpdf\\command",
+      "",
+      "\"[#RectoExe]\" --create-images \"%1\""
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.bmp\\shell\\recto.createpdf",
+      "",
+      "Create PDF with Recto\u2026"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.bmp\\shell\\recto.createpdf",
+      "MultiSelectModel",
+      "Single"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.bmp\\shell\\recto.createpdf\\command",
+      "",
+      "\"[#RectoExe]\" --create-images \"%1\""
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.jp2\\shell\\recto.createpdf",
+      "",
+      "Create PDF with Recto\u2026"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.jp2\\shell\\recto.createpdf",
+      "MultiSelectModel",
+      "Single"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.jp2\\shell\\recto.createpdf\\command",
+      "",
+      "\"[#RectoExe]\" --create-images \"%1\""
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.j2k\\shell\\recto.createpdf",
+      "",
+      "Create PDF with Recto\u2026"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.j2k\\shell\\recto.createpdf",
+      "MultiSelectModel",
+      "Single"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.j2k\\shell\\recto.createpdf\\command",
+      "",
+      "\"[#RectoExe]\" --create-images \"%1\""
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.jpx\\shell\\recto.createpdf",
+      "",
+      "Create PDF with Recto\u2026"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.jpx\\shell\\recto.createpdf",
+      "MultiSelectModel",
+      "Single"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\SystemFileAssociations\\.jpx\\shell\\recto.createpdf\\command",
+      "",
+      "\"[#RectoExe]\" --create-images \"%1\""
+    ]
+  ],
+  "mode": "dualScope"
+}

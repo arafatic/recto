@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Name=Recto
+GenericName=PDF Editor
+Comment=Read, organize, combine, split and secure PDFs
+Exec=recto %U
+TryExec=recto
+Icon=local.recto.desktop
+Terminal=false
+StartupNotify=true
+StartupWMClass=local.recto.desktop
+Categories=Office;Viewer;
+Keywords=pdf;viewer;editor;annotate;sign;forms;merge;split;
+MimeType=application/pdf;

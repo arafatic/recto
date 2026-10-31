@@ -1,0 +1,20 @@
+[package]
+name = "recto-forms"
+description = "Interactive forms (AcroForm): field model, filling, appearances, reset (ISO 32000-2 §12.7)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+recto-cos = { workspace = true }
+recto-fonts = { workspace = true }
+recto-content = { workspace = true }
+recto-model = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+hayro-syntax = { workspace = true }
+proptest = { workspace = true }

@@ -1,0 +1,4 @@
+Recto icon artwork (geometric lowercase r. on black).
+Contributor-original, created for Recto in 2026 with AI assistance.
+Licensed under MIT OR Apache-2.0. See LICENSE-MIT and LICENSE-APACHE in the repository root.
+No font or upstream brand artwork is incorporated.

@@ -1,0 +1,18 @@
+[package]
+name = "recto-organize"
+description = "Page and document-structure edits: rotate, delete, move, insert pages; document info"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+recto-content = { workspace = true }
+recto-cos = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+recto-oracle = { workspace = true }
+hayro-syntax = { workspace = true }

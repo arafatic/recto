@@ -1,0 +1,20 @@
+[package]
+name = "recto-audit"
+description = "Verification tooling: audit documents for faux redactions (opaque covers over extractable text)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+recto-cos = { workspace = true }
+recto-content = { workspace = true }
+recto-edit = { workspace = true }
+recto-model = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]

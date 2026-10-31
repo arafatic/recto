@@ -1,0 +1,20 @@
+[package]
+name = "recto-measure"
+description = "Calibrated 2D PDF measurements, viewports and snapping"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+recto-cos = { workspace = true }
+recto-model = { workspace = true }
+recto-content = { workspace = true }
+recto-annot = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+recto-testkit = { workspace = true }

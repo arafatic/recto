@@ -1,0 +1,11 @@
+[package]
+name = "recto-geom"
+description = "Geometry primitives for Recto (points, rects, page transforms)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
