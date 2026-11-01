@@ -10,23 +10,57 @@ permissions:
   contents: write
 
 jobs:
-  build-macos:
-    name: Build macOS (Apple Silicon)
-    runs-on: macos-14
+  build:
+    name: Build (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: windows
+            os: windows-latest
+            artifact: Recto-windows-x64.zip
+          - name: linux
+            os: ubuntu-latest
+            artifact: Recto-linux-x64.tar.gz
+          - name: macos
+            os: macos-14
+            artifact: Recto-macos-arm64.zip
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install Linux dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libglib2.0-dev libgtk-3-dev libssl-dev pkg-config libx11-dev libasound2-dev libudev-dev
+
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: aarch64-apple-darwin
 
-      - name: Build release binaries
+      - name: Build release binary
+        run: cargo build --release --bin recto
+
+      - name: Package Windows archive
+        if: matrix.os == 'windows-latest'
+        shell: bash
         run: |
-          cargo build --release --locked --bin recto --bin recto-cli --target aarch64-apple-darwin
+          mkdir -p dist-windows
+          cp target/release/recto.exe dist-windows/
+          7z a -tzip Recto-windows-x64.zip ./dist-windows/*
 
-      - name: Assemble Recto.app
+      - name: Package Linux archive
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          mkdir -p dist-linux/bin
+          cp target/release/recto dist-linux/bin/
+          chmod +x dist-linux/bin/*
+          tar -czvf Recto-linux-x64.tar.gz -C dist-linux .
+
+      - name: Package macOS application bundle
+        if: matrix.os == 'macos-14'
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
           if [ -z "$VERSION" ] || [ "$VERSION" = "$GITHUB_REF_NAME" ]; then
@@ -36,8 +70,7 @@ jobs:
           
           APP="Recto.app"
           mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
-          
-          cp "target/aarch64-apple-darwin/release/recto" "$APP/Contents/MacOS/recto"
+          cp "target/release/recto" "$APP/Contents/MacOS/recto"
           chmod +x "$APP/Contents/MacOS/recto"
           
           if [ -f "assets/app-icon/recto.icns" ]; then
@@ -58,107 +91,30 @@ jobs:
           done
           
           codesign --force --deep --sign - "$APP"
-          
           ditto -c -k --keepParent "$APP" "Recto-macos-arm64.zip"
-          ditto -c -k "target/aarch64-apple-darwin/release/recto-cli" "recto-cli-macos-arm64.zip"
 
-      - name: Upload macOS artifacts
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: macos-artifacts
-          path: |
-            Recto-macos-arm64.zip
-            recto-cli-macos-arm64.zip
+          name: ${{ matrix.name }}-archive
+          path: ${{ matrix.artifact }}
 
-  build-windows:
-    name: Build Windows (x86_64)
-    runs-on: windows-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: x86_64-pc-windows-msvc
-
-      - name: Build release binaries
-        run: |
-          cargo build --release --locked --bin recto --bin recto-cli --target x86_64-pc-windows-msvc
-
-      - name: Package Windows artifacts
-        shell: bash
-        run: |
-          mkdir -p dist-windows
-          cp target/x86_64-pc-windows-msvc/release/recto.exe dist-windows/
-          cp target/x86_64-pc-windows-msvc/release/recto-cli.exe dist-windows/
-          cp README.md dist-windows/ 2>/dev/null || true
-          cp LICENSE-MIT dist-windows/ 2>/dev/null || true
-          
-          7z a -tzip Recto-windows-x86_64.zip ./dist-windows/*
-
-      - name: Upload Windows artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-artifacts
-          path: Recto-windows-x86_64.zip
-
-  build-linux:
-    name: Build Linux (x86_64)
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libssl-dev pkg-config libx11-dev libasound2-dev libudev-dev
-
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: x86_64-unknown-linux-gnu
-
-      - name: Build release binaries
-        run: |
-          cargo build --release --locked --bin recto --bin recto-cli --target x86_64-unknown-linux-gnu
-
-      - name: Package Linux artifacts
-        run: |
-          mkdir -p dist-linux/bin
-          cp target/x86_64-unknown-linux-gnu/release/recto dist-linux/bin/
-          cp target/x86_64-unknown-linux-gnu/release/recto-cli dist-linux/bin/
-          chmod +x dist-linux/bin/*
-          cp README.md dist-linux/ 2>/dev/null || true
-          cp LICENSE-MIT dist-linux/ 2>/dev/null || true
-          
-          tar -czvf Recto-linux-x86_64.tar.gz -C dist-linux .
-
-      - name: Upload Linux artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: linux-artifacts
-          path: Recto-linux-x86_64.tar.gz
-
-  create-release:
-    name: Create Draft Release
-    needs: [build-macos, build-windows, build-linux]
+  release:
+    name: Publish Release
+    needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Download all artifacts
+      - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
           path: artifacts
           merge-multiple: true
 
-      - name: Create Draft Release and Upload Assets
+      - name: Upload Release Assets
         uses: softprops/action-gh-release@v2
         with:
-          draft: true
           generate_release_notes: true
           files: |
+            artifacts/Recto-windows-x64.zip
+            artifacts/Recto-linux-x64.tar.gz
             artifacts/Recto-macos-arm64.zip
-            artifacts/recto-cli-macos-arm64.zip
-            artifacts/Recto-windows-x86_64.zip
-            artifacts/Recto-linux-x86_64.tar.gz
