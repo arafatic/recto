@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<!-- Hardened-runtime entitlements for Recto. Deliberately empty: the app is pure Rust,
-     loads no unsigned code, needs no JIT, and is not sandboxed (it opens files by path, from the
-     command line and drag-and-drop). Add exceptions here only with a reason in a comment. -->
+<!-- Hardened-runtime and App Sandbox entitlements for Recto.
+     Enables outbound network client requests strictly for in-app update checks against GitHub API. -->
 <plist version="1.0">
 <dict>
+	<key>com.apple.security.network.client</key>
+	<true/>
 </dict>
 </plist>

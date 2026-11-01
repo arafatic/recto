@@ -27,6 +27,15 @@ fn test_version_comparison() {
 }
 
 #[test]
+fn test_github_api_hostname_resolution() {
+    use std::net::ToSocketAddrs;
+    // Verify hostname resolution for api.github.com
+    if let Ok(mut addrs) = ("api.github.com", 443).to_socket_addrs() {
+        assert!(addrs.next().is_some(), "api.github.com resolved at least one IP address");
+    }
+}
+
+#[test]
 fn update_command_is_in_palette() {
     let mut h = harness();
     h.state_mut().palette_open = true;

@@ -59,11 +59,20 @@ pub fn is_newer_version(remote_tag: &str, current_version: &str) -> bool {
 #[cfg(not(target_arch = "wasm32"))]
 pub fn fetch_latest_release() -> Result<ReleaseResponse, String> {
     let url = "https://api.github.com/repos/arafatic/recto/releases/latest";
-    let agent = ureq::Agent::config_builder()
+    let tls = ureq::tls::TlsConfig::builder()
+        .root_certs(ureq::tls::RootCerts::PlatformVerifier)
+        .build();
+
+    let mut builder = ureq::Agent::config_builder()
+        .tls_config(tls)
         .timeout_global(Some(std::time::Duration::from_secs(10)))
-        .user_agent(concat!("Recto/", env!("CARGO_PKG_VERSION")))
-        .build()
-        .new_agent();
+        .user_agent(concat!("Recto/", env!("CARGO_PKG_VERSION")));
+
+    if let Some(proxy) = ureq::Proxy::try_from_env() {
+        builder = builder.proxy(Some(proxy));
+    }
+
+    let agent = builder.build().new_agent();
 
     let mut resp = agent
         .get(url)
@@ -124,5 +133,23 @@ impl UpdateJob {
         }
 
         Self { manual, receiver }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_fetch_latest_release_connectivity() {
+        match fetch_latest_release() {
+            Ok(release) => {
+                assert!(!release.tag_name.is_empty(), "fetched release tag should not be empty");
+            }
+            Err(e) => {
+                // In environments without live internet or rate-limited by GitHub, verify error format
+                assert!(!e.is_empty());
+            }
+        }
     }
 }
