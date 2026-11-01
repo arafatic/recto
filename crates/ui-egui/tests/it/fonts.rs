@@ -1,4 +1,4 @@
-//! The interface fonts with and without the optional craft-fonts build input (`CRAFT_FONTS_DIR`).
+//! The interface fonts with and without the optional craft-fonts build input (`RECTO_FONTS_DIR`).
 
 use egui::epaint::text::{Fonts, TextOptions};
 use egui::{Color32, FontFamily, FontId};
@@ -39,7 +39,7 @@ fn layout_widths(fonts: &mut Fonts, text: &str) -> Vec<f32> {
 #[test]
 fn japanese_ui_text_uses_craft_fonts() {
     if recto_fonts::ui_japanese_fonts().is_empty() {
-        eprintln!("skipping japanese_ui_text_uses_craft_fonts: built without craft-fonts (set CRAFT_FONTS_DIR to run it)");
+        eprintln!("skipping japanese_ui_text_uses_craft_fonts: built without craft-fonts (set RECTO_FONTS_DIR to run it)");
         return;
     }
     let defs = theme::font_definitions();
@@ -48,7 +48,7 @@ fn japanese_ui_text_uses_craft_fonts() {
         let first_jp = stack.iter().position(|n| n.starts_with("BIZ UDPGothic")).expect("BIZ UDPGothic is a fallback");
         let own = stack.iter().position(|n| n == "Inter" || n == "JetBrainsMono").expect("the app's own font");
         assert!(own < first_jp, "{family:?}: {stack:?}");
-        assert!(stack[first_jp..].iter().all(|n| recto_fonts::CRAFT_FONTS.iter().any(|f| f.name() == *n)), "{stack:?}");
+        assert!(stack[first_jp..].iter().all(|n| recto_fonts::RECTO_FONTS.iter().any(|f| f.name() == *n)), "{stack:?}");
     }
     let mut fonts = Fonts::new(TextOptions::default(), defs);
     for id in families() {
@@ -66,7 +66,7 @@ fn japanese_ui_text_uses_craft_fonts() {
 #[test]
 fn chinese_ui_text_prefers_the_chinese_face() {
     if recto_fonts::ui_chinese_fonts().is_empty() {
-        eprintln!("skipping chinese_ui_text_prefers_the_chinese_face: no Hans face bundled (set CRAFT_FONTS_DIR with a Chinese face to run it)");
+        eprintln!("skipping chinese_ui_text_prefers_the_chinese_face: no Hans face bundled (set RECTO_FONTS_DIR with a Chinese face to run it)");
         return;
     }
     let defs = theme::font_definitions_for(true);
@@ -93,7 +93,7 @@ fn chinese_ui_text_prefers_the_chinese_face() {
 fn arabic_ui_text_uses_craft_fonts() {
     let arabic: Vec<String> = recto_fonts::ui_arabic_fonts().iter().map(|f| f.name()).collect();
     if arabic.is_empty() {
-        eprintln!("skipping arabic_ui_text_uses_craft_fonts: no Arab face bundled (set CRAFT_FONTS_DIR with an Arabic face to run it)");
+        eprintln!("skipping arabic_ui_text_uses_craft_fonts: no Arab face bundled (set RECTO_FONTS_DIR with an Arabic face to run it)");
         return;
     }
     let defs = theme::font_definitions();
@@ -114,9 +114,9 @@ fn arabic_ui_text_uses_craft_fonts() {
 /// and ష held apart by a zero-width non-joiner.
 #[test]
 fn telugu_ui_text_uses_craft_fonts() {
-    let telugu: Vec<String> = recto_fonts::CRAFT_FONTS.iter().filter(|f| f.covers("Telu")).map(|f| f.name()).collect();
+    let telugu: Vec<String> = recto_fonts::RECTO_FONTS.iter().filter(|f| f.covers("Telu")).map(|f| f.name()).collect();
     if telugu.is_empty() {
-        eprintln!("skipping telugu_ui_text_uses_craft_fonts: no Telu face bundled (set CRAFT_FONTS_DIR with a Telugu face to run it)");
+        eprintln!("skipping telugu_ui_text_uses_craft_fonts: no Telu face bundled (set RECTO_FONTS_DIR with a Telugu face to run it)");
         return;
     }
     let defs = theme::font_definitions();
@@ -189,7 +189,7 @@ fn system_fallback_covers_devanagari() {
 #[test]
 fn devanagari_ui_text_uses_craft_fonts() {
     if recto_fonts::ui_devanagari_fonts().is_empty() {
-        eprintln!("skipping devanagari_ui_text_uses_craft_fonts: built without craft-fonts (set CRAFT_FONTS_DIR to run it)");
+        eprintln!("skipping devanagari_ui_text_uses_craft_fonts: built without craft-fonts (set RECTO_FONTS_DIR to run it)");
         return;
     }
     let defs = theme::font_definitions();

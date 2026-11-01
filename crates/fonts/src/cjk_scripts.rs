@@ -24,7 +24,7 @@ pub fn is_cjk_script(tag: &str) -> bool {
 }
 
 /// Whether a manifest's comma-separated script list contains `script` exactly, ignoring spaces.
-/// The interface and document lookups use exact tags (`CraftFont::covers`), so a regional tag
+/// The interface and document lookups use exact tags (`EmbeddedFont::covers`), so a regional tag
 /// such as `Hans-HK` is not a `Hans` entry.
 pub fn has_script_tag(scripts: &str, script: &str) -> bool {
     scripts.split(',').any(|tag| tag.trim() == script)
@@ -49,7 +49,7 @@ pub fn cjk_cap_bytes(family: &str, wasm: bool) -> u64 {
 /// Decide whether a CJK face is embedded, skipped, or rejected.
 ///
 /// The Japanese document/UI families are embedded whole. Every other CJK family uses its cap;
-/// `required` marks the native Simplified Chinese manifest of a `CRAFT_FONTS_REQUIRED` build,
+/// `required` marks the native Simplified Chinese manifest of a `RECTO_FONTS_REQUIRED` build,
 /// where an over-cap face must fail instead of quietly disappearing.
 pub fn cjk_size_decision(family: &str, bytes: u64, wasm: bool, required: bool) -> CjkSizeDecision {
     if WHOLE_CJK_FAMILIES.contains(&family) {

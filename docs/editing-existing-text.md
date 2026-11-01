@@ -39,7 +39,7 @@ shares a single copy of it. The Type 3 fonts generated for Japanese or Hebrew ch
 page's fonts lack are made anew by each edit; after an edit, those nothing on the page shows any
 more leave the page's resources, unless some content that could name them can't be read.
 Original subset bytes are
-preserved. Optional matching faces from `CRAFT_FONTS_DIR` can also complete source subsets;
+preserved. Optional matching faces from `RECTO_FONTS_DIR` can also complete source subsets;
 this works only when that build input actually contains the full face. This change does not
 add a font binary or change the release font pin. Fonts shared by releases belong in
 `arafatic/craft-fonts` under the repository's asset rules.

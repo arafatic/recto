@@ -17,9 +17,9 @@ pub fn face_key(name: &str) -> String {
 }
 
 /// Full, approved faces of the source family. This never silently selects another family.
-pub fn matching_faces(name: &str) -> Vec<&'static crate::CraftFont> {
+pub fn matching_faces(name: &str) -> Vec<&'static crate::EmbeddedFont> {
     let key = face_key(name);
-    crate::CRAFT_FONTS.iter().filter(|f| face_key(f.family) == key || face_key(&f.name()) == key).collect()
+    crate::RECTO_FONTS.iter().filter(|f| face_key(f.family) == key || face_key(&f.name()) == key).collect()
 }
 
 /// Whether a complete font program can show every non-newline character.

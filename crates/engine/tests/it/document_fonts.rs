@@ -87,7 +87,7 @@ fn contextual_arabic_marks_ligatures_and_mixed_bidi_keep_logical_text_after_reop
         return;
     }
     let Some(font) = recto_fonts::document_arabic_font() else {
-        eprintln!("set CRAFT_FONTS_DIR to test full Arabic glyph programs");
+        eprintln!("set RECTO_FONTS_DIR to test full Arabic glyph programs");
         return;
     };
     if recto_fonts::embedding::validate(font.bytes).is_err() {

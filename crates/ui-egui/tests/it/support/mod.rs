@@ -81,10 +81,10 @@ pub fn outside_menus<'h>(h: &'h Harness<'static, RectoApp>, label: &str) -> egui
 /// switch to Chinese installs its fonts for the next frame, so the first frame in Chinese draws
 /// with the fonts of the language before it.
 ///
-/// A build that requires craft-fonts (`CRAFT_FONTS_REQUIRED=1`, as the CI gate sets) never skips:
+/// A build that requires craft-fonts (`RECTO_FONTS_REQUIRED=1`, as the CI gate sets) never skips:
 /// a missing glyph there is a failure.
 pub fn skip_without_glyphs(name: &str, language: &str, text: &str) -> bool {
-    if std::env::var("CRAFT_FONTS_REQUIRED").as_deref() == Ok("1") {
+    if std::env::var("RECTO_FONTS_REQUIRED").as_deref() == Ok("1") {
         return false;
     }
     let catalog = i18n::LANGUAGES.iter().find(|l| l.code == language).map_or("", |l| l.source);
@@ -100,6 +100,6 @@ pub fn skip_without_glyphs(name: &str, language: &str, text: &str) -> bool {
     let Some(missing) = missing else {
         return false;
     };
-    eprintln!("skipping {name}: no interface font draws {missing:?} (set CRAFT_FONTS_DIR to a craft-fonts checkout with a face for it)");
+    eprintln!("skipping {name}: no interface font draws {missing:?} (set RECTO_FONTS_DIR to a craft-fonts checkout with a face for it)");
     true
 }

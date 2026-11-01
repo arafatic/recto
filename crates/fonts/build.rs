@@ -1,10 +1,10 @@
-//! Embeds the fonts of the optional craft-fonts build input (`CRAFT_FONTS_DIR`) as `CRAFT_FONTS`.
-//! The recipe is craft-fonts' `docs/integration.md`; unset, `CRAFT_FONTS` is empty. It only reads
+//! Embeds the fonts of the optional craft-fonts build input (`RECTO_FONTS_DIR`) as `RECTO_FONTS`.
+//! The recipe is craft-fonts' `docs/integration.md`; unset, `RECTO_FONTS` is empty. It only reads
 //! the local checkout (no network). On wasm32 it embeds only the UI faces (BIZ UDPGothic Regular
 //! and any `Arab`, `Telu`, `Hebr`, `Thai` or `Deva` face), to keep the web build within hosting
 //! limits (Cloudflare Pages: 25 MiB per file). Native builds also read the optional
 //! `fonts/simplified-chinese-manifest.txt` (LXGW WenKai Lite); it is never embedded on wasm.
-//! `CRAFT_FONTS_REQUIRED` makes both the checkout and that native manifest required.
+//! `RECTO_FONTS_REQUIRED` makes both the checkout and that native manifest required.
 
 use std::fmt::Write as _;
 use std::path::PathBuf;
@@ -12,31 +12,31 @@ use std::path::PathBuf;
 #[path = "src/cjk_scripts.rs"]
 mod cjk_scripts;
 
-/// Build-script entry point: embed craft-fonts from `CRAFT_FONTS_DIR`, make a missing or invalid input fatal
-/// when `CRAFT_FONTS_REQUIRED` is set, and write `craft_fonts.rs` to `OUT_DIR`.
+/// Build-script entry point: embed craft-fonts from `RECTO_FONTS_DIR`, make a missing or invalid input fatal
+/// when `RECTO_FONTS_REQUIRED` is set, and write `embedded_fonts.rs` to `OUT_DIR`.
 fn main() {
-    println!("cargo::rerun-if-env-changed=CRAFT_FONTS_DIR");
-    println!("cargo::rerun-if-env-changed=CRAFT_FONTS_REQUIRED");
-    let mut src = String::from("pub static CRAFT_FONTS: &[CraftFont] = &[\n");
-    let required = std::env::var_os("CRAFT_FONTS_REQUIRED").is_some();
-    if let Some(dir) = std::env::var_os("CRAFT_FONTS_DIR").map(PathBuf::from) {
+    println!("cargo::rerun-if-env-changed=RECTO_FONTS_DIR");
+    println!("cargo::rerun-if-env-changed=RECTO_FONTS_REQUIRED");
+    let mut src = String::from("pub static RECTO_FONTS: &[EmbeddedFont] = &[\n");
+    let required = std::env::var_os("RECTO_FONTS_REQUIRED").is_some();
+    if let Some(dir) = std::env::var_os("RECTO_FONTS_DIR").map(PathBuf::from) {
         match craft_fonts(&dir, required) {
             Ok(entries) => src.push_str(&entries),
-            Err(e) if required => println!("cargo::error=CRAFT_FONTS_DIR={}: {e}", dir.display()),
-            Err(e) => println!("cargo::warning=building without craft-fonts: CRAFT_FONTS_DIR={}: {e}", dir.display()),
+            Err(e) if required => println!("cargo::error=RECTO_FONTS_DIR={}: {e}", dir.display()),
+            Err(e) => println!("cargo::warning=building without craft-fonts: RECTO_FONTS_DIR={}: {e}", dir.display()),
         }
     } else if required {
-        println!("cargo::error=CRAFT_FONTS_REQUIRED is set but CRAFT_FONTS_DIR is missing");
+        println!("cargo::error=RECTO_FONTS_REQUIRED is set but RECTO_FONTS_DIR is missing");
     }
     src.push_str("];\n");
-    let out = PathBuf::from(std::env::var_os("OUT_DIR").unwrap_or_default()).join("craft_fonts.rs");
+    let out = PathBuf::from(std::env::var_os("OUT_DIR").unwrap_or_default()).join("embedded_fonts.rs");
     if let Err(e) = std::fs::write(&out, src) {
         println!("cargo::error=writing {}: {e}", out.display());
     }
 }
 
 /// The main manifest, plus the native-only Simplified Chinese manifest. The latter is optional
-/// for ordinary builds and required when `CRAFT_FONTS_REQUIRED` is set, so a required build can
+/// for ordinary builds and required when `RECTO_FONTS_REQUIRED` is set, so a required build can
 /// never pass the Chinese UI tests only by skipping them.
 fn craft_fonts(dir: &std::path::Path, required: bool) -> Result<String, String> {
     let wasm = std::env::var("CARGO_CFG_TARGET_ARCH").is_ok_and(|a| a == "wasm32");
@@ -46,7 +46,7 @@ fn craft_fonts(dir: &std::path::Path, required: bool) -> Result<String, String> 
         println!("cargo::rerun-if-changed={}", chinese.display());
         match chinese.try_exists() {
             Ok(false) if required => {
-                return Err(format!("{}: CRAFT_FONTS_REQUIRED is set but the simplified-Chinese font manifest is missing", chinese.display()));
+                return Err(format!("{}: RECTO_FONTS_REQUIRED is set but the simplified-Chinese font manifest is missing", chinese.display()));
             }
             Ok(false) => {}
             Ok(true) => match manifest(dir, &chinese, false, required) {
@@ -62,7 +62,7 @@ fn craft_fonts(dir: &std::path::Path, required: bool) -> Result<String, String> 
     Ok(out)
 }
 
-/// One `CraftFont { .. }` initialiser per manifest line.
+/// One `EmbeddedFont { .. }` initialiser per manifest line.
 ///
 /// `strict_cap` is set for the required native Simplified Chinese manifest: a face that does not
 /// fit its cap must fail the build rather than be silently left out, so a required build cannot
@@ -72,7 +72,7 @@ fn manifest(dir: &std::path::Path, manifest: &std::path::Path, wasm: bool, stric
     let text = std::fs::read_to_string(manifest).map_err(|e| format!("{}: {e}", manifest.display()))?;
     let mut out = String::new();
     // A required native Chinese manifest must add the Hans face itself, not merely some other
-    // CJK face that happens to fit: otherwise CRAFT_FONTS_REQUIRED would pass while the promised
+    // CJK face that happens to fit: otherwise RECTO_FONTS_REQUIRED would pass while the promised
     // Simplified Chinese fallback is still absent.
     let mut has_hans = false;
     for line in text.lines().map(str::trim).filter(|l| !l.is_empty() && !l.starts_with('#')) {
@@ -91,7 +91,7 @@ fn manifest(dir: &std::path::Path, manifest: &std::path::Path, wasm: bool, stric
                 cjk_scripts::CjkSizeDecision::Reject => {
                     let cap = cjk_scripts::cjk_cap_bytes(family, wasm);
                     return Err(format!(
-                        "{file}: the {family} face is larger than the {cap}-byte native Chinese UI cap; CRAFT_FONTS_REQUIRED cannot embed it"
+                        "{file}: the {family} face is larger than the {cap}-byte native Chinese UI cap; RECTO_FONTS_REQUIRED cannot embed it"
                     ));
                 }
             }
@@ -119,14 +119,14 @@ fn manifest(dir: &std::path::Path, manifest: &std::path::Path, wasm: bool, stric
         let scripts: Vec<String> = scripts.split(',').map(|s| format!("{:?}", s.trim())).collect();
         let _ = writeln!(
             out,
-            "    CraftFont {{ family: {family:?}, style: {style:?}, scripts: &[{}], bytes: include_bytes!({:?}) }},",
+            "    EmbeddedFont {{ family: {family:?}, style: {style:?}, scripts: &[{}], bytes: include_bytes!({:?}) }},",
             scripts.join(", "),
             path.display().to_string(),
         );
     }
     if strict_cap && !has_hans {
         return Err(format!(
-            "{}: CRAFT_FONTS_REQUIRED is set but the manifest emits no Hans face (a Simplified Chinese face is required)",
+            "{}: RECTO_FONTS_REQUIRED is set but the manifest emits no Hans face (a Simplified Chinese face is required)",
             manifest.display()
         ));
     }
@@ -148,10 +148,10 @@ mod manifest_tests {
         for scripts in ["Hant,Latn", "Hans-HK,Latn", "Latn"] {
             std::fs::write(&path, format!("Fixture | Regular | face.ttf | {scripts}\n")).unwrap();
             assert!(manifest(&root, &path, false, true).unwrap_err().contains("no Hans face"), "{scripts}");
-            assert!(manifest(&root, &path, false, false).unwrap().contains("CraftFont {"), "optional input stays usable");
+            assert!(manifest(&root, &path, false, false).unwrap().contains("EmbeddedFont {"), "optional input stays usable");
         }
         std::fs::write(&path, "Fixture | Regular | face.ttf | Latn, Hans\n").unwrap();
-        assert!(manifest(&root, &path, false, true).unwrap().contains("CraftFont {"));
+        assert!(manifest(&root, &path, false, true).unwrap().contains("EmbeddedFont {"));
         std::fs::remove_file(root.join("face.ttf")).unwrap();
         assert!(manifest(&root, &path, false, true).is_err(), "a missing Hans asset cannot satisfy required input");
         std::fs::remove_dir_all(root).unwrap();

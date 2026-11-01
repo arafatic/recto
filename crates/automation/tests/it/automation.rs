@@ -644,7 +644,7 @@ fn explicit_font_and_disjoint_ranges_save_reopen_through_tools() {
 #[test]
 fn added_arabic_text_keeps_copy_search_and_editor_order_after_retyping_and_reopen() {
     if recto_fonts::document_arabic_font().is_none() {
-        eprintln!("set CRAFT_FONTS_DIR to exercise added Arabic text");
+        eprintln!("set RECTO_FONTS_DIR to exercise added Arabic text");
         return;
     }
     let dir = workdir("arabic-copy-order");
@@ -3201,7 +3201,7 @@ fn styled_cyrillic_fallback_is_batched_through_tools_and_reopen() {
 
 /// #2593: a paragraph whose own font cannot show a character is written from Recto's fallback
 /// faces. The Cyrillic the craft-fonts faces lack (Uzbek қ ғ ҳ, Kazakh ә ө ү ұ һ) comes from the
-/// bundled Inter face, so the edit is not refused even without `CRAFT_FONTS_DIR`, and the words
+/// bundled Inter face, so the edit is not refused even without `RECTO_FONTS_DIR`, and the words
 /// survive a save and a reopen. (`crates/edit/src/tests.rs::uzbek_and_kazakh_cyrillic_use_the_bundled_latin_face`
 /// pins which face drew them.)
 #[test]

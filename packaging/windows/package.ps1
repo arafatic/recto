@@ -16,14 +16,14 @@
 
 .EXAMPLE
   pwsh packaging/windows/package.ps1 -Arch x64
-  pwsh packaging/windows/package.ps1 -Arch x86 -SkipBuild   # set CRAFT_FONTS_DIR, or -BuiltWithoutCraftFonts
+  pwsh packaging/windows/package.ps1 -Arch x86 -SkipBuild   # set RECTO_FONTS_DIR, or -BuiltWithoutCraftFonts
   pwsh packaging/windows/package.ps1 -Arch arm64     # cross-compiled; needs the MSVC ARM64 build tools
 #>
 param(
   [ValidateSet('x64', 'x86', 'arm64')] [string] $Arch = 'x64',
   [switch] $SkipBuild,
-  # -SkipBuild only: the existing binaries were built without CRAFT_FONTS_DIR, so they embed no
-  # craft-fonts faces. Without CRAFT_FONTS_DIR this assertion is required: package.ps1 cannot
+  # -SkipBuild only: the existing binaries were built without RECTO_FONTS_DIR, so they embed no
+  # craft-fonts faces. Without RECTO_FONTS_DIR this assertion is required: package.ps1 cannot
   # otherwise know whether the binaries need the fonts' OFL notices.
   [switch] $BuiltWithoutCraftFonts
 )
@@ -31,13 +31,13 @@ $ErrorActionPreference = 'Stop'
 $Root = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 
 if ($BuiltWithoutCraftFonts -and -not $SkipBuild) {
-  throw '-BuiltWithoutCraftFonts describes an existing build made without CRAFT_FONTS_DIR; use it only with -SkipBuild.'
+  throw '-BuiltWithoutCraftFonts describes an existing build made without RECTO_FONTS_DIR; use it only with -SkipBuild.'
 }
-if ($BuiltWithoutCraftFonts -and $env:CRAFT_FONTS_DIR) {
-  throw '-BuiltWithoutCraftFonts cannot be combined with CRAFT_FONTS_DIR.'
+if ($BuiltWithoutCraftFonts -and $env:RECTO_FONTS_DIR) {
+  throw '-BuiltWithoutCraftFonts cannot be combined with RECTO_FONTS_DIR.'
 }
-if ($SkipBuild -and -not $env:CRAFT_FONTS_DIR -and -not $BuiltWithoutCraftFonts) {
-  throw 'package.ps1 -SkipBuild needs CRAFT_FONTS_DIR to stage the OFL notices of embedded craft-fonts, or -BuiltWithoutCraftFonts when the binaries were built without it.'
+if ($SkipBuild -and -not $env:RECTO_FONTS_DIR -and -not $BuiltWithoutCraftFonts) {
+  throw 'package.ps1 -SkipBuild needs RECTO_FONTS_DIR to stage the OFL notices of embedded craft-fonts, or -BuiltWithoutCraftFonts when the binaries were built without it.'
 }
 
 function Invoke-Native([string] $What, [scriptblock] $Block) {
@@ -132,11 +132,11 @@ if (-not (Test-Path (Join-Path $Models 'ATTRIBUTION.txt')) -or -not (Get-ChildIt
 $Docs = Join-Path $Stage 'font-licences'
 New-Item -ItemType Directory -Force -Path $Docs | Out-Null
 $HasCraftFontLicences = 0
-if ($env:CRAFT_FONTS_DIR) {
+if ($env:RECTO_FONTS_DIR) {
   . (Join-Path $PSScriptRoot 'font-notices.ps1')
   # Validate both native manifests before copying anything. One family's notice cannot
   # stand in for another's; retain complete files, including copyright and reserved names.
-  $fontNotices = @(Get-CraftFontNotices $env:CRAFT_FONTS_DIR (Test-Path Env:CRAFT_FONTS_REQUIRED))
+  $fontNotices = @(Get-CraftFontNotices $env:RECTO_FONTS_DIR (Test-Path Env:RECTO_FONTS_REQUIRED))
   foreach ($ofl in $fontNotices) {
     Copy-Item -LiteralPath $ofl.FullName -Destination (Join-Path $Docs "OFL-$($ofl.Directory.Name).txt")
     $HasCraftFontLicences = 1
@@ -179,7 +179,7 @@ foreach ($f in 'LICENSE', 'LICENSE-MIT', 'LICENSE-APACHE') {
   $p = Join-Path $Root $f
   if (Test-Path $p) { Copy-Item $p $Portable }
 }
-# Builds made with craft-fonts (CRAFT_FONTS_DIR, set for every release) embed its fonts: ship the
+# Builds made with craft-fonts (RECTO_FONTS_DIR, set for every release) embed its fonts: ship the
 # same verified notices the MSI carries, fonts\<family>\OFL.txt -> OFL-<family>.txt.
 if ($HasCraftFontLicences -eq 1) {
   Copy-Item (Join-Path $Docs 'OFL-*.txt') $Portable

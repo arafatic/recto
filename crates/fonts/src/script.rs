@@ -48,7 +48,7 @@ pub struct GlyphOutline {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum GlyphError {
-    /// This build has no Japanese face: it was built without craft-fonts (`CRAFT_FONTS_DIR`).
+    /// This build has no Japanese face: it was built without craft-fonts (`RECTO_FONTS_DIR`).
     NoFont,
     Missing,
     TooComplex,
@@ -144,7 +144,7 @@ pub fn japanese_glyph(ch: char) -> Result<GlyphOutline, GlyphError> {
 
 /// The bounded outline and advance from the explicitly selected craft-fonts face.
 /// Uses the same complexity and missing-glyph checks as [`japanese_glyph`].
-pub fn japanese_glyph_from(face: &crate::CraftFont, ch: char) -> Result<GlyphOutline, GlyphError> {
+pub fn japanese_glyph_from(face: &crate::EmbeddedFont, ch: char) -> Result<GlyphOutline, GlyphError> {
     let Ok(font) = FontRef::new(face.bytes) else { return Err(GlyphError::Missing) };
     let loc = LocationRef::default();
     let metrics = font.metrics(Size::unscaled(), loc);
@@ -318,7 +318,7 @@ mod tests {
     #[test]
     fn japanese_glyphs_come_from_craft_fonts() {
         if crate::document_japanese_font().is_none() {
-            eprintln!("skipping the glyph checks: built without craft-fonts (set CRAFT_FONTS_DIR)");
+            eprintln!("skipping the glyph checks: built without craft-fonts (set RECTO_FONTS_DIR)");
             assert_eq!(super::japanese_glyph('こ'), Err(super::GlyphError::NoFont));
             return;
         }

@@ -329,7 +329,7 @@ fn signature_appearance_labels_keep_their_separator() {
 fn japanese_labels_have_glyphs() {
     let craft = recto_fonts::ui_japanese_fonts();
     let Some(web) = craft.iter().find(|f| f.family == "BIZ UDPGothic" && f.style == "Regular") else {
-        eprintln!("skipping Japanese glyph checks: build with CRAFT_FONTS_DIR to run them");
+        eprintln!("skipping Japanese glyph checks: build with RECTO_FONTS_DIR to run them");
         return;
     };
     let (entries, _) = parse_entries(JA().0.source, 1);
@@ -337,7 +337,7 @@ fn japanese_labels_have_glyphs() {
     let web_name = web.name();
     let mut web_only = crate::theme::font_definitions();
     for family in web_only.families.values_mut() {
-        family.retain(|name| !recto_fonts::CRAFT_FONTS.iter().any(|face| face.name() == *name) || *name == web_name);
+        family.retain(|name| !recto_fonts::RECTO_FONTS.iter().any(|face| face.name() == *name) || *name == web_name);
     }
     use egui::epaint::text::{Fonts, TextOptions};
     for (build, defs) in [("desktop", crate::theme::font_definitions()), ("web", web_only)] {
@@ -511,7 +511,7 @@ fn contextual_labels_fall_back_to_the_plain_translation() {
 fn telugu_labels_have_glyphs() {
     let telugu: Vec<String> = recto_fonts::ui_telugu_fonts().iter().map(|f| f.name()).collect();
     if telugu.is_empty() {
-        eprintln!("skipping Telugu glyph checks: build with CRAFT_FONTS_DIR and a Telugu face to run them");
+        eprintln!("skipping Telugu glyph checks: build with RECTO_FONTS_DIR and a Telugu face to run them");
         return;
     }
     let te = Lang::from_code("te").expect("te registered");
@@ -519,7 +519,7 @@ fn telugu_labels_have_glyphs() {
     let labels: String = entries.iter().flat_map(|e| e.translation.chars()).chain(te.name().chars()).filter(|c| !c.is_control()).collect();
     let mut telugu_only = crate::theme::font_definitions();
     for family in telugu_only.families.values_mut() {
-        family.retain(|name| !recto_fonts::CRAFT_FONTS.iter().any(|face| face.name() == *name) || telugu.contains(name));
+        family.retain(|name| !recto_fonts::RECTO_FONTS.iter().any(|face| face.name() == *name) || telugu.contains(name));
     }
     use egui::epaint::text::{Fonts, TextOptions};
     for (build, defs) in [("all faces", crate::theme::font_definitions()), ("Telugu face only", telugu_only)] {
@@ -1084,7 +1084,7 @@ fn persian_is_registered_and_persists() {
 fn arabic_labels_have_glyphs() {
     let faces: Vec<String> = recto_fonts::ui_arabic_fonts().iter().map(|f| f.name()).collect();
     if faces.is_empty() {
-        eprintln!("skipping Arabic glyph checks: build with CRAFT_FONTS_DIR and an Arabic face to run them");
+        eprintln!("skipping Arabic glyph checks: build with RECTO_FONTS_DIR and an Arabic face to run them");
         return;
     }
     let ar = arabic();
@@ -1092,7 +1092,7 @@ fn arabic_labels_have_glyphs() {
     let labels: String = entries.iter().flat_map(|e| e.translation.chars()).chain(ar.name().chars()).filter(|c| !c.is_control()).collect();
     let mut arabic_only = crate::theme::font_definitions();
     for family in arabic_only.families.values_mut() {
-        family.retain(|name| !recto_fonts::CRAFT_FONTS.iter().any(|face| face.name() == *name) || faces.contains(name));
+        family.retain(|name| !recto_fonts::RECTO_FONTS.iter().any(|face| face.name() == *name) || faces.contains(name));
     }
     use egui::epaint::text::{Fonts, TextOptions};
     for (build, defs) in [("all faces", crate::theme::font_definitions()), ("Arabic face only", arabic_only)] {

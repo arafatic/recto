@@ -264,7 +264,7 @@ fn shaped_width(t: &AddedText, s: &str, rtl: bool) -> f64 {
 pub(super) fn arabic_error(e: GlyphError, text: &str) -> EditError {
     EditError::Invalid(match e {
         GlyphError::NoFont => "Arabic text needs Recto's Arabic font, which this build doesn't include \
-                               (to build it in, set CRAFT_FONTS_DIR to a craft-fonts checkout that has an Arab face)"
+                               (to build it in, set RECTO_FONTS_DIR to a craft-fonts checkout that has an Arab face)"
             .into(),
         GlyphError::Missing => format!("the Arabic font can't show \"{text}\""),
         GlyphError::TooComplex => format!("the Arabic font's glyphs for \"{text}\" are too complex"),
@@ -274,7 +274,7 @@ pub(super) fn arabic_error(e: GlyphError, text: &str) -> EditError {
 pub(super) fn hebrew_error(e: GlyphError, text: &str) -> EditError {
     EditError::Invalid(match e {
         GlyphError::NoFont => "Hebrew text needs Recto's Hebrew font, which this build doesn't include \
-                               (to build it in, set CRAFT_FONTS_DIR to a craft-fonts checkout that has a Hebr face)"
+                               (to build it in, set RECTO_FONTS_DIR to a craft-fonts checkout that has a Hebr face)"
             .into(),
         GlyphError::Missing => format!("the Hebrew font can't show \"{text}\""),
         GlyphError::TooComplex => format!("the Hebrew font's glyphs for \"{text}\" are too complex"),
@@ -284,7 +284,7 @@ pub(super) fn hebrew_error(e: GlyphError, text: &str) -> EditError {
 pub(super) fn thai_error(e: GlyphError, text: &str) -> EditError {
     EditError::Invalid(match e {
         GlyphError::NoFont => {
-            "Thai text needs a Thai font in this build; rebuild with CRAFT_FONTS_DIR pointing to craft-fonts with a Thai face".into()
+            "Thai text needs a Thai font in this build; rebuild with RECTO_FONTS_DIR pointing to craft-fonts with a Thai face".into()
         }
         GlyphError::Missing => format!("the Thai font can't show \"{text}\""),
         GlyphError::TooComplex => "the Thai glyphs are too complex; use a shorter text box".into(),

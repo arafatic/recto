@@ -1083,9 +1083,9 @@ fn added_arabic_text_is_shaped_in_display_order_and_stays_searchable() {
     let text =
         AddedText { rect: [72.0, 600.0, 400.0, 700.0], text: "مرحبا World".into(), size: 14.0, align: Align::Right, ..AddedText::default() };
     if recto_fonts::document_arabic_font().is_none() {
-        eprintln!("skipping the Arabic drawing checks: built without a craft-fonts Arab face (set CRAFT_FONTS_DIR)");
+        eprintln!("skipping the Arabic drawing checks: built without a craft-fonts Arab face (set RECTO_FONTS_DIR)");
         let err = add_content(&mut doc, 0, &Content::Text(text)).unwrap_err();
-        assert!(matches!(&err, EditError::Invalid(m) if m.contains("CRAFT_FONTS_DIR")), "{err:?}");
+        assert!(matches!(&err, EditError::Invalid(m) if m.contains("RECTO_FONTS_DIR")), "{err:?}");
         assert!(!doc.is_modified(), "nothing is written when the font is missing");
         return;
     }
@@ -1134,7 +1134,7 @@ fn added_hebrew_text_is_drawn_right_to_left_and_stays_searchable() {
         ..AddedText::default()
     };
     if recto_fonts::document_hebrew_font(false).is_none() {
-        eprintln!("skipping the Hebrew drawing checks: built without a craft-fonts Hebr face (set CRAFT_FONTS_DIR)");
+        eprintln!("skipping the Hebrew drawing checks: built without a craft-fonts Hebr face (set RECTO_FONTS_DIR)");
         assert_eq!(first_undrawable(&text), Some('ש'));
         let err = add_content(&mut doc, 0, &Content::Text(text)).unwrap_err();
         assert!(matches!(&err, EditError::Invalid(m) if m.contains("U+05E9")), "{err:?}");
@@ -1440,7 +1440,7 @@ fn without_craft_fonts(test: &str) -> bool {
     if recto_fonts::document_japanese_font().is_some() {
         return false;
     }
-    eprintln!("skipping {test}: built without craft-fonts (set CRAFT_FONTS_DIR to run it)");
+    eprintln!("skipping {test}: built without craft-fonts (set RECTO_FONTS_DIR to run it)");
     true
 }
 
@@ -1499,7 +1499,7 @@ fn japanese_line_fallback_uses_real_source_family_and_weight() {
     text::replace_line(&mut bold, 0, 0, replacement).unwrap();
     text::replace_line(&mut serif, 0, 0, replacement).unwrap();
     assert_ne!(fallback_paths(&sans), fallback_paths(&serif), "sans source must not use Mincho outlines");
-    if recto_fonts::CRAFT_FONTS.iter().any(|f| f.family == "BIZ UDPGothic" && f.style == "Bold") {
+    if recto_fonts::RECTO_FONTS.iter().any(|f| f.family == "BIZ UDPGothic" && f.style == "Bold") {
         assert_ne!(fallback_paths(&sans), fallback_paths(&bold), "bold must change the actual glyph paths");
     }
     for doc in [&sans, &bold, &serif] {
@@ -1534,7 +1534,7 @@ fn japanese_paragraph_fallback_honors_requested_family_and_weight() {
     )
     .unwrap();
     assert_ne!(fallback_paths(&regular), fallback_paths(&serif), "requested serif must change actual outlines");
-    if recto_fonts::CRAFT_FONTS.iter().any(|f| f.family == "BIZ UDPGothic" && f.style == "Bold") {
+    if recto_fonts::RECTO_FONTS.iter().any(|f| f.family == "BIZ UDPGothic" && f.style == "Bold") {
         assert_ne!(fallback_paths(&regular), fallback_paths(&bold), "requested bold must change actual outlines");
         let mut source_bold = styled_text_page("Helvetica-Bold");
         text::replace_block(&mut source_bold, 0, 0, replacement).unwrap();
@@ -1576,8 +1576,8 @@ fn cyrillic_in_a_serif_line_falls_back_to_a_face_that_has_it() {
         return;
     }
     let replacement = "Привет, world";
-    let has_all = |f: &recto_fonts::CraftFont| replacement.chars().all(|ch| recto_fonts::japanese_glyph_from(f, ch).is_ok());
-    if !recto_fonts::CRAFT_FONTS.iter().any(|f| f.covers("Jpan") && has_all(f)) {
+    let has_all = |f: &recto_fonts::EmbeddedFont| replacement.chars().all(|ch| recto_fonts::japanese_glyph_from(f, ch).is_ok());
+    if !recto_fonts::RECTO_FONTS.iter().any(|f| f.covers("Jpan") && has_all(f)) {
         eprintln!("skipping: no Japanese fallback face has Cyrillic");
         return;
     }
@@ -1722,7 +1722,7 @@ fn rewriting_japanese_twice_keeps_only_the_fallback_fonts_it_shows() {
     let mut doc = text_page("BT /F1 12 Tf 72 700 Td (Hello) Tj ET");
     if text::rewrite_block(&mut doc, 0, 0, Some("日本語の文章"), &text::BlockStyle::default()).is_err() {
         assert!(recto_fonts::document_japanese_font().is_none());
-        eprintln!("built without a craft-fonts Japanese face: the Type 3 path is checked with CRAFT_FONTS_DIR");
+        eprintln!("built without a craft-fonts Japanese face: the Type 3 path is checked with RECTO_FONTS_DIR");
         return;
     }
     let first: Vec<_> = fallback_fonts(&doc).into_iter().map(|(_, f)| f).collect();
@@ -1758,7 +1758,7 @@ fn japanese_replacement_over_240_unique_glyphs_is_split_across_fallback_fonts() 
     if without_craft_fonts("japanese_replacement_over_240_unique_glyphs_is_split_across_fallback_fonts") {
         // Without craft-fonts the long text gets the clear error, not the old limit message.
         let err = text::replace_line(&mut doc, 0, 0, &replacement).unwrap_err().to_string();
-        assert!(err.contains("CRAFT_FONTS_DIR"), "{err}");
+        assert!(err.contains("RECTO_FONTS_DIR"), "{err}");
         return;
     }
     text::replace_line(&mut doc, 0, 0, &replacement).unwrap();
@@ -1830,7 +1830,7 @@ fn styled_fallback_batches_keep_face_choices_and_range_styles() {
     if without_craft_fonts("styled_fallback_batches_keep_face_choices_and_range_styles") {
         return;
     }
-    if !recto_fonts::CRAFT_FONTS.iter().any(|f| f.family == "BIZ UDPGothic" && f.style == "Bold") {
+    if !recto_fonts::RECTO_FONTS.iter().any(|f| f.family == "BIZ UDPGothic" && f.style == "Bold") {
         eprintln!("skipping: no bold Gothic face");
         return;
     }
@@ -1894,7 +1894,7 @@ fn styled_fallback_budget_is_enforced_before_objects_are_written() {
     assert_eq!(write_incremental(&doc, &SaveOptions::default()).unwrap(), original, "refusal must add no objects");
     assert_eq!(write_incremental(&snapshot, &SaveOptions::default()).unwrap(), original);
     if without_craft_fonts("styled_fallback_budget_is_enforced_before_objects_are_written") {
-        assert!(err.contains("CRAFT_FONTS_DIR"), "{err}");
+        assert!(err.contains("RECTO_FONTS_DIR"), "{err}");
         return;
     }
     assert!(err.contains("more than 64 fallback glyphs"), "{err}");
@@ -1912,7 +1912,7 @@ fn styled_fallback_same_base_font_and_character_keep_both_weights() {
     if without_craft_fonts("styled_fallback_same_base_font_and_character_keep_both_weights") {
         return;
     }
-    if !recto_fonts::CRAFT_FONTS.iter().any(|f| f.family == "BIZ UDPGothic" && f.style == "Bold") {
+    if !recto_fonts::RECTO_FONTS.iter().any(|f| f.family == "BIZ UDPGothic" && f.style == "Bold") {
         eprintln!("skipping: no bold Gothic face");
         return;
     }
@@ -2208,7 +2208,7 @@ fn japanese_edit_without_craft_fonts_is_a_clear_error() {
     }
     for result in [line.map(|_| ()), block.map(|_| ())] {
         let Err(EditError::Invalid(msg)) = result else { panic!("expected a clear error, got {result:?}") };
-        assert!(msg.contains("Japanese fallback font") && msg.contains("CRAFT_FONTS_DIR"), "{msg}");
+        assert!(msg.contains("Japanese fallback font") && msg.contains("RECTO_FONTS_DIR"), "{msg}");
     }
     assert_eq!(page_content_bytes(&doc, 0), before);
     let latin = text::replace_line(&mut doc, 0, 0, "Hello").unwrap();
@@ -3615,7 +3615,7 @@ fn justified_text_in_the_type3_fallback_stretches_its_spaces() {
     let rewritten = text::rewrite_block(&mut doc, 0, 0, Some(typed), &style);
     if recto_fonts::document_japanese_font().is_none() {
         assert!(rewritten.is_err());
-        eprintln!("built without a craft-fonts Japanese face: the Type 3 path is checked with CRAFT_FONTS_DIR");
+        eprintln!("built without a craft-fonts Japanese face: the Type 3 path is checked with RECTO_FONTS_DIR");
         return;
     }
     rewritten.unwrap();
@@ -3645,9 +3645,9 @@ fn hebrew_letters_the_page_font_lacks_use_the_hebrew_face() {
     let line = text::replace_line(&mut doc, 0, 0, typed);
     if recto_fonts::document_hebrew_font(false).is_none() {
         let Err(EditError::Invalid(msg)) = line else { panic!("expected a clear error, got {line:?}") };
-        assert!(msg.contains("Hebrew fallback font") && msg.contains("CRAFT_FONTS_DIR"), "{msg}");
+        assert!(msg.contains("Hebrew fallback font") && msg.contains("RECTO_FONTS_DIR"), "{msg}");
         assert_eq!(page_content_bytes(&doc, 0), before);
-        eprintln!("built without a craft-fonts Hebrew face: the Type 3 path is checked with CRAFT_FONTS_DIR");
+        eprintln!("built without a craft-fonts Hebrew face: the Type 3 path is checked with RECTO_FONTS_DIR");
         return;
     }
     assert_eq!(line.unwrap().substituted.as_deref(), Some("Noto Sans Hebrew Type3"));
@@ -3758,7 +3758,7 @@ fn page_text_the_standard_fonts_cant_draw_is_refused() {
     } else {
         // #403's own refusal says what's missing; the Add-text editor still keeps the draft.
         let err = add_content(&mut doc, 0, &Content::Text(arabic("مرحبا Hello"))).unwrap_err().to_string();
-        assert!(err.contains("CRAFT_FONTS_DIR"), "{err}");
+        assert!(err.contains("RECTO_FONTS_DIR"), "{err}");
         assert_eq!(first_undrawable(&arabic("مرحبا Hello")), Some('م'));
         // An existing item may still take Arabic (#403 keeps it movable), but nothing else that
         // the standard font would write as `?`.
@@ -4070,7 +4070,7 @@ fn added_thai_text_wraps_clusters_and_survives_reopen() {
         assert_eq!(first_undrawable(&t), Some('ส'));
         let before = list_added(&doc);
         let err = add_content(&mut doc, 0, &Content::Text(t)).unwrap_err().to_string();
-        assert!(err.contains("Thai") && err.contains("CRAFT_FONTS_DIR"), "{err}");
+        assert!(err.contains("Thai") && err.contains("RECTO_FONTS_DIR"), "{err}");
         assert_eq!(list_added(&doc), before);
         return;
     }
@@ -5813,7 +5813,7 @@ fn draft_layout_matches_the_paragraph_an_applied_edit_draws() {
 #[test]
 fn japanese_paragraphs_wrap_between_characters_without_closing_marks_at_a_row_start() {
     if recto_fonts::document_japanese_font().is_none() {
-        eprintln!("skipping the Japanese wrapping checks: built without craft-fonts (set CRAFT_FONTS_DIR)");
+        eprintln!("skipping the Japanese wrapping checks: built without craft-fonts (set RECTO_FONTS_DIR)");
         return;
     }
     let text = "日本語の文章は単語の間に空白がないので、どの文字の間でも行を折り返せます。ただし「句読点」や小さい「っ」は行頭に来ません。";

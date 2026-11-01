@@ -20,9 +20,9 @@ Today it holds what generated appearances need without a font program:
   flattening refuses. `script_missing` names what the typed-signature script font and its Inter fallback both lack.
 
 It also holds the fonts of the optional [craft-fonts](https://github.com/arafatic/craft-fonts)
-build input. `build.rs` embeds them as `CRAFT_FONTS` when the build sets
-`CRAFT_FONTS_DIR=<checkout>` (and fails if it can't while `CRAFT_FONTS_REQUIRED=1`, as releases
-set). Without that variable `CRAFT_FONTS` is empty and everything below copes:
+build input. `build.rs` embeds them as `RECTO_FONTS` when the build sets
+`RECTO_FONTS_DIR=<checkout>` (and fails if it can't while `RECTO_FONTS_REQUIRED=1`, as releases
+set). Without that variable `RECTO_FONTS` is empty and everything below copes:
 
 - `ui_japanese_fonts`: the `Jpan` faces for the interface, BIZ UDPGothic first.
 - `ui_chinese_fonts`: the `Hans` faces for the interface, in manifest order (without one,

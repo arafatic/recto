@@ -73,7 +73,7 @@ pub struct Manifest {
     pub build_input: Vec<BuildInput>,
 }
 
-/// Material compiled in only when the builder opts in (e.g. `CRAFT_FONTS_DIR`): not in this
+/// Material compiled in only when the builder opts in (e.g. `RECTO_FONTS_DIR`): not in this
 /// repository, not downloaded by it. Its own repository attributes each file.
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -514,7 +514,7 @@ mod tests {
     fn build_inputs_need_an_open_licence_and_https_links() {
         let input = |licence: &str, attribution: &str| BuildInput {
             name: "craft-fonts".into(),
-            option: "CRAFT_FONTS_DIR".into(),
+            option: "RECTO_FONTS_DIR".into(),
             title: "t".into(),
             author: "a".into(),
             source: "https://github.com/arafatic/craft-fonts".into(),

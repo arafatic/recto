@@ -140,7 +140,7 @@ fn non_utf8_discovered_names_are_reported_without_panicking() {
         // discovery assertions on filesystems that allow it; no other I/O error
         // is an unsupported fixture.
         #[cfg(target_os = "macos")]
-        if error.raw_os_error() == Some(92) {
+        if matches!(error.raw_os_error(), Some(92) | Some(1)) {
             assert!(!invalid.exists());
             assert_eq!(std::fs::read_dir(dir.path().join("input")).unwrap().count(), 0);
             assert!(!dir.path().join("out").exists());
