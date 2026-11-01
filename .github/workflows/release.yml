@@ -47,20 +47,14 @@ jobs:
         if: matrix.os == 'windows-latest'
         shell: pwsh
         run: |
+          choco install innosetup --no-progress -y
+          $env:PATH += ";C:\Program Files (x86)\Inno Setup 6"
+
           $VERSION = "${env:GITHUB_REF_NAME}" -replace '^v', ''
           if (-not $VERSION) { $VERSION = "0.14.0" }
-          
-          if (-not (Get-Command iscc -ErrorAction SilentlyContinue)) {
-            if (Test-Path "C:\Program Files (x86)\Inno Setup 6\ISCC.exe") {
-              $env:PATH += ";C:\Program Files (x86)\Inno Setup 6"
-            } else {
-              choco install innosetup --no-progress -y
-              $env:PATH += ";C:\Program Files (x86)\Inno Setup 6"
-            }
-          }
-          iscc "/DMyAppVersion=$VERSION" packaging/windows/recto.iss
-          Move-Item dist-installer/Recto-windows-x64-setup.exe .
-          
+
+          iscc "/DMyAppVersion=$VERSION" packaging/windows/setup.iss
+
           New-Item -ItemType Directory -Force -Path dist-windows
           Copy-Item target/release/recto.exe dist-windows/
           7z a -tzip Recto-windows-x64.zip ./dist-windows/*
