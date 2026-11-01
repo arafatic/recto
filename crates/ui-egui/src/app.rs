@@ -245,6 +245,8 @@ impl RectoApp {
             replace_draft: None,
             number_draft: NumberDraft { from: 1, to: 1, style: recto_engine::LabelStyle::Decimal, prefix: String::new(), start: 1 },
             word_count_draft: word_count_ui::Draft::default(),
+            available_update: None,
+            update_job: None,
         }
     }
 
@@ -300,6 +302,51 @@ impl RectoApp {
     /// Notify with a `{name}`-style template in the UI language (placeholders filled once).
     pub fn notify_fmt(&mut self, template: &str, args: &[(&str, &str)]) {
         self.notify(i18n::fmt(tl!(template), args));
+    }
+
+    /// Check for application updates asynchronously.
+    pub fn check_for_updates(&mut self, manual: bool) {
+        if self.update_job.is_some() {
+            if manual {
+                self.notify_tr("Checking for updates…");
+            }
+            return;
+        }
+        if manual {
+            self.notify_tr("Checking for updates…");
+        }
+        self.update_job = Some(crate::updater::UpdateJob::start(manual));
+    }
+
+    /// Poll any background update check and handle the outcome.
+    pub(crate) fn poll_updates(&mut self) {
+        let Some(job) = &self.update_job else { return };
+        match job.receiver.try_recv() {
+            Ok(outcome) => {
+                let manual = job.manual;
+                self.update_job = None;
+                match outcome {
+                    crate::updater::UpdateOutcome::Available(details) => {
+                        self.available_update = Some(details);
+                        self.dialog = Some(crate::Dialog::UpdateAvailable);
+                    }
+                    crate::updater::UpdateOutcome::UpToDate => {
+                        if manual {
+                            self.notify_tr("Recto is up to date");
+                        }
+                    }
+                    crate::updater::UpdateOutcome::Error(err) => {
+                        if manual {
+                            self.notify_fmt("Couldn't check for updates ({error})", &[("error", &err)]);
+                        }
+                    }
+                }
+            }
+            Err(std::sync::mpsc::TryRecvError::Empty) => {}
+            Err(std::sync::mpsc::TryRecvError::Disconnected) => {
+                self.update_job = None;
+            }
+        }
     }
 
     /// `true` while any open document still waits for page renders (used by headless capture).
@@ -506,6 +553,7 @@ impl eframe::App for RectoApp {
         self.poll_ocr();
         self.poll_optimize();
         self.poll_action();
+        self.poll_updates();
         self.process_file_requests();
         #[cfg(not(target_arch = "wasm32"))]
         self.process_picked();

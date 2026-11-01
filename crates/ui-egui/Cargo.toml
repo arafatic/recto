@@ -48,6 +48,8 @@ unicode-bidi = "0.3"
 skrifa = "0.44"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+semver = { version = "1", features = ["serde"] }
+ureq = { version = "3.4", default-features = false, features = ["rustls-no-provider", "_ring", "gzip", "platform-verifier"] }
 craft-update = { workspace = true }
 # Control-channel tokens.
 getrandom = "0.4"

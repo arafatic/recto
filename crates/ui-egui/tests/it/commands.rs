@@ -74,7 +74,7 @@ fn every_registered_command_is_implemented() {
         // Page-text Copy needs a loaded view and egui context, covered by text_select.
         if PICKERS.contains(&spec.id)
             || spec.id == "edit.copy"
-            || matches!(spec.id, "help.check_updates" | "help.discord" | "help.app_page" | "help.github" | "help.website")
+            || matches!(spec.id, "help.discord" | "help.app_page" | "help.github" | "help.website")
         {
             continue;
         }

@@ -221,7 +221,7 @@ const SIGN: &[&str] = &[
     "sign.panel",
 ];
 const WINDOW: &[&str] = &["view.next_tab", "view.previous_tab"];
-const HELP: &[&str] = &["help.shortcuts", SEP, "help.about"];
+const HELP: &[&str] = &["help.check_updates", SEP, "help.shortcuts", SEP, "help.about"];
 
 /// A registry shortcut as a craft-keymap chord: `command` is ⌘ (Ctrl elsewhere) and `mac_ctrl`
 /// the Control key on macOS. `None` for a key craft-keymap doesn't name.
@@ -667,8 +667,8 @@ mod tests {
         keys.dedup();
         assert_eq!(keys.len(), count, "no command is listed twice");
         for spec in commands::COMMANDS.iter().filter(|s| s.menu.is_some()) {
-            if matches!(spec.id, "file.open_recent" | "help.app_page" | "help.github" | "help.website" | "help.discord" | "help.check_updates") {
-                continue; // Recent files is a submenu; upstream promotion/update links are omitted in Recto.
+            if matches!(spec.id, "file.open_recent" | "help.app_page" | "help.github" | "help.website" | "help.discord") {
+                continue; // Recent files is a submenu; upstream promotion links are omitted in Recto.
             }
             let it = item(&bar, &CommandRef::new(spec.id));
             let shortcut = spec.shortcut.or((spec.id == "edit.copy").then_some(crate::commands::COPY));

@@ -31,6 +31,8 @@ pub use combine_grid::ThumbState as CombineThumb;
 pub use combine_ui::{Columns as CombineColumns, CombineView, Lock as CombineLock, SortKey};
 mod commands;
 pub mod control;
+pub mod updater;
+pub use updater::UpdateDetails;
 mod menus;
 /// Header & footer / watermark / background dialog types (tests and automation).
 pub mod marks {
@@ -609,4 +611,8 @@ pub struct RectoApp {
     pub pending_full_screen: Option<DocId>,
     /// An absolute GoToR target waiting for approval, before any target-file I/O (#1364).
     pub pending_remote_link: Option<PendingRemoteLink>,
+    /// Information about a newer version if detected by the update checker.
+    pub available_update: Option<UpdateDetails>,
+    /// Active background update checking task.
+    pub(crate) update_job: Option<updater::UpdateJob>,
 }

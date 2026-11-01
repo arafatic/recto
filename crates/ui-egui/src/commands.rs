@@ -91,7 +91,7 @@ impl RectoApp {
                     .is_some_and(|v| !v.organize && (v.all_text || v.selected_text().is_some_and(|t| !t.is_empty()))))
             && (spec.needs != commands::Needs::TwoPageView || self.active.and_then(|i| self.views.get(i)).is_some_and(crate::DocView::cover_applies))
             && match spec.id {
-                "help.check_updates" | "help.discord" | "help.app_page" | "help.github" | "help.website" => false,
+                "help.discord" | "help.app_page" | "help.github" | "help.website" => false,
                 "view.previous_view" => self.active.and_then(|i| self.views.get(i)).is_some_and(|v| !v.back.is_empty()),
                 "view.next_view" => self.active.and_then(|i| self.views.get(i)).is_some_and(|v| !v.forward.is_empty()),
                 _ => true,
@@ -153,7 +153,7 @@ impl RectoApp {
 
     fn execute_unguarded(&mut self, id: &str) -> bool {
         // Keep the legacy registry id inert without changing PDF engine metadata.
-        if matches!(id, "help.check_updates" | "help.discord" | "help.app_page" | "help.github" | "help.website") {
+        if matches!(id, "help.discord" | "help.app_page" | "help.github" | "help.website") {
             return false;
         }
         let Some(spec) = commands::command(id) else { return false };
@@ -242,6 +242,7 @@ impl RectoApp {
             "optimize.reduce" => self.reduce_file_size(),
             "help.shortcuts" => self.dialog = Some(Dialog::Shortcuts),
             "help.about" => self.dialog = Some(Dialog::About),
+            "help.check_updates" => self.check_for_updates(true),
             _ => return None,
         }
         Some(true)

@@ -27,6 +27,7 @@ const INFO_KEYS: [&str; 4] = ["Title", "Author", "Subject", "Keywords"];
 #[derive(Default)]
 struct Pending {
     apply: bool,
+    download_update: bool,
     split_now: Option<crate::SplitPlan>,
     split_ready: Option<crate::SplitPlan>,
     extract_now: bool,
@@ -125,6 +126,7 @@ fn dialogs(app: &mut RectoApp, ctx: &egui::Context) {
             Dialog::Print => 820.0,
             Dialog::FieldProps | Dialog::BulkFieldProps => 600.0,
             Dialog::About => 780.0,
+            Dialog::UpdateAvailable => 480.0,
             _ => 520.0,
         });
         if dialog_body(ui, app, dialog, &mut req) {
@@ -423,6 +425,11 @@ fn dialog_body(ui: &mut egui::Ui, app: &mut RectoApp, dialog: Dialog, req: &mut 
         }
         Dialog::About => {
             if !dialog_about(ui, req) {
+                return false;
+            }
+        }
+        Dialog::UpdateAvailable => {
+            if !dialog_update(ui, app, req) {
                 return false;
             }
         }
@@ -1497,6 +1504,60 @@ fn dialog_about(ui: &mut egui::Ui, _req: &mut Pending) -> bool {
     true
 }
 
+/// `Dialog::UpdateAvailable` content. Returns `false` as it draws its own action buttons.
+fn dialog_update(ui: &mut egui::Ui, app: &mut RectoApp, req: &mut Pending) -> bool {
+    let t = Tokens::get(ui.ctx());
+    let current_version = env!("CARGO_PKG_VERSION");
+    let (version, notes) = match &app.available_update {
+        Some(u) => (u.version.as_str(), u.notes.as_str()),
+        None => ("Unknown", ""),
+    };
+
+    ui.horizontal(|ui| {
+        ui.vertical(|ui| {
+            ui.label(egui::RichText::new(tl!("Update Available")).font(theme::semibold(18.0)));
+            ui.add_space(4.0);
+            ui.label(crate::i18n::fmt(
+                tl!("A new version of Recto is available: v{new} (current: v{cur})."),
+                &[("new", version), ("cur", current_version)],
+            ));
+        });
+    });
+
+    if !notes.is_empty() {
+        ui.add_space(10.0);
+        ui.label(egui::RichText::new(tl!("Release Notes")).font(theme::semibold(13.0)));
+        ui.add_space(4.0);
+        egui::Frame::new()
+            .fill(t.hover)
+            .corner_radius(egui::CornerRadius::same(6))
+            .inner_margin(egui::Margin::same(8))
+            .show(ui, |ui| {
+                egui::ScrollArea::vertical()
+                    .max_height(180.0)
+                    .auto_shrink([false, true])
+                    .show(ui, |ui| {
+                        ui.label(egui::RichText::new(notes).color(t.text));
+                    });
+            });
+    }
+
+    ui.add_space(16.0);
+    ui.horizontal(|ui| {
+        ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+            if widgets::pill_button(ui, tl!("Download Update"), true).clicked() {
+                req.download_update = true;
+                req.close = true;
+            }
+            if widgets::pill_button(ui, tl!("Later"), false).clicked() {
+                req.close = true;
+            }
+        });
+    });
+
+    false
+}
+
 fn dialog_footer(ui: &mut egui::Ui, app: &mut RectoApp, dialog: Dialog, req: &mut Pending) {
     ui.add_space(16.0);
     let changed = draft_changes(app).is_some_and(|c| !c.is_empty());
@@ -1555,6 +1616,12 @@ fn finish_dialog(app: &mut RectoApp, dialog: Dialog, modal_closed: bool, req: &m
 
 /// Runs the one-shot requests the dialog made.
 fn finish_requests(app: &mut RectoApp, dialog: Dialog, modal_closed: bool, req: &mut Pending) {
+    if req.download_update {
+        if let Some(details) = &app.available_update {
+            let url = details.url.clone();
+            app.open_url(&url);
+        }
+    }
     if let Some(yes) = req.recover {
         let keys: Vec<String> = app.recoverable.iter().map(|m| m.key.clone()).collect();
         if yes {

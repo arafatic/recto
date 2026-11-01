@@ -478,6 +478,7 @@ fn app_creator<'a>(
                 log::warn!("--{k} {v}: {e}");
             }
         }
+        app.check_for_updates(false);
         Ok(Box::new(app))
     })
 }

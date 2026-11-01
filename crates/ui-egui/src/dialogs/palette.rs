@@ -58,7 +58,7 @@ pub fn show(app: &mut RectoApp, ctx: &egui::Context) {
     let mut hits: Vec<(usize, Hit)> = Vec::new();
     let active = app.active_ids().map(|(_, id)| id);
     for spec in recto_engine::commands::COMMANDS {
-        if matches!(spec.id, "help.app_page" | "help.github" | "help.website" | "help.discord" | "help.check_updates") {
+        if matches!(spec.id, "help.app_page" | "help.github" | "help.website" | "help.discord") {
             continue;
         }
         let label = recto_engine::commands::current_label(spec, &app.session, active);
