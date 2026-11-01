@@ -7,6 +7,16 @@ A fast, lightweight, and open-source PDF editor built with Rust and egui.
 - Fast document viewing and editing
 - Open-source and privacy-focused
 
+## Download Recto
+
+Download the latest version for your operating system:
+
+| Platform | Download Link |
+| :--- | :--- |
+| **macOS (Apple Silicon)** | [Download .dmg / .zip](https://github.com/arafatic/recto/releases/latest) |
+| **Windows (64-bit)** | [Download .msi / .exe](https://github.com/arafatic/recto/releases/latest) |
+| **Linux** | [Download .AppImage](https://github.com/arafatic/recto/releases/latest) |
+
 ## Getting Started
 
 ### Prerequisites
