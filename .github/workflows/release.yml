@@ -43,12 +43,26 @@ jobs:
       - name: Build release binary
         run: cargo build --release --bin recto
 
-      - name: Package Windows archive
+      - name: Package Windows installer and archive
         if: matrix.os == 'windows-latest'
-        shell: bash
+        shell: pwsh
         run: |
-          mkdir -p dist-windows
-          cp target/release/recto.exe dist-windows/
+          $VERSION = "${env:GITHUB_REF_NAME}" -replace '^v', ''
+          if (-not $VERSION) { $VERSION = "0.14.0" }
+          
+          if (-not (Get-Command iscc -ErrorAction SilentlyContinue)) {
+            if (Test-Path "C:\Program Files (x86)\Inno Setup 6\ISCC.exe") {
+              $env:PATH += ";C:\Program Files (x86)\Inno Setup 6"
+            } else {
+              choco install innosetup --no-progress -y
+              $env:PATH += ";C:\Program Files (x86)\Inno Setup 6"
+            }
+          }
+          iscc "/DMyAppVersion=$VERSION" packaging/windows/recto.iss
+          Move-Item dist-installer/Recto-windows-x64-setup.exe .
+          
+          New-Item -ItemType Directory -Force -Path dist-windows
+          Copy-Item target/release/recto.exe dist-windows/
           7z a -tzip Recto-windows-x64.zip ./dist-windows/*
 
       - name: Package Linux archive
@@ -97,7 +111,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.name }}-archive
-          path: ${{ matrix.artifact }}
+          path: |
+            ${{ matrix.artifact }}
+            Recto-windows-x64-setup.exe
+          if-no-files-found: ignore
 
   release:
     name: Publish Release
@@ -115,6 +132,7 @@ jobs:
         with:
           generate_release_notes: true
           files: |
+            artifacts/Recto-windows-x64-setup.exe
             artifacts/Recto-windows-x64.zip
             artifacts/Recto-linux-x64.tar.gz
             artifacts/Recto-macos-arm64.zip
