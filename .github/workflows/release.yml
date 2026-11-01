@@ -90,7 +90,7 @@ jobs:
             fi
           done
           
-          codesign --force --deep --sign - "$APP"
+          codesign --force --options runtime --entitlements packaging/macos/entitlements.plist --deep --sign - "$APP"
           ditto -c -k --keepParent "$APP" "Recto-macos-arm64.zip"
 
       - name: Upload artifact

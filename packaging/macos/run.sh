@@ -37,5 +37,6 @@ for notice in NOTICE LICENSE LICENSE-MIT LICENSE-APACHE ATTRIBUTION.md; do
   fi
 done
 cp "$ROOT/packaging/macos/Credits.rtf" "$APP/Contents/Resources/Credits.rtf"
+codesign --force --options runtime --entitlements "$ROOT/packaging/macos/entitlements.plist" --sign - "$APP"
 trap - EXIT
 exec "$APP/Contents/MacOS/recto" "$@"
