@@ -27,7 +27,7 @@ fn harness(setup: impl FnOnce(&mut RectoApp) + 'static) -> Harness<'static, Rect
         app
     });
     // Fonts install on frame 1 and apply on frame 2.
-    h.run_steps(4);
+    h.run_steps(6);
     h
 }
 

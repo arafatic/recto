@@ -65,7 +65,7 @@ fn harness_pages_at(pages: usize, width: f32, scale: f32) -> (Harness<'static, R
         app.open_bytes("doc.pdf", None, fixture(pages)).unwrap();
         app
     });
-    h.run_steps(4);
+    h.run_steps(6);
     let client = slot.lock().unwrap().take().unwrap();
     (h, client)
 }

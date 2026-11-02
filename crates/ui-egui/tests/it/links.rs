@@ -12,7 +12,7 @@ fn harness(setup: impl FnOnce(&mut RectoApp) + 'static) -> Harness<'static, Rect
         setup(&mut app);
         app
     });
-    h.run_steps(4);
+    h.run_steps(6);
     h
 }
 
