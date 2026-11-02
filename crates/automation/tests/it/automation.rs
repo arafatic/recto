@@ -3165,7 +3165,7 @@ fn editing_existing_text_through_tools() {
 #[test]
 fn styled_cyrillic_fallback_is_batched_through_tools_and_reopen() {
     if recto_fonts::document_japanese_font().is_none() {
-        eprintln!("skipping: built without craft-fonts");
+        eprintln!("skipping: built without bundled fonts");
         return;
     }
     let dir = workdir("styled-fallback");
@@ -3200,7 +3200,7 @@ fn styled_cyrillic_fallback_is_batched_through_tools_and_reopen() {
 }
 
 /// #2593: a paragraph whose own font cannot show a character is written from Recto's fallback
-/// faces. The Cyrillic the craft-fonts faces lack (Uzbek қ ғ ҳ, Kazakh ә ө ү ұ һ) comes from the
+/// faces. The Cyrillic the bundled font faces lack (Uzbek қ ғ ҳ, Kazakh ә ө ү ұ һ) comes from the
 /// bundled Inter face, so the edit is not refused even without `RECTO_FONTS_DIR`, and the words
 /// survive a save and a reopen. (`crates/edit/src/tests.rs::uzbek_and_kazakh_cyrillic_use_the_bundled_latin_face`
 /// pins which face drew them.)

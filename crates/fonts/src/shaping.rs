@@ -1,4 +1,4 @@
-//! Arabic, Hebrew and Thai text shaping with the matching craft-fonts face and bounded glyph outlines.
+//! Arabic, Hebrew and Thai text shaping with the matching bundled font face and bounded glyph outlines.
 
 use std::sync::OnceLock;
 
@@ -170,7 +170,7 @@ mod tests {
 
     fn face_or_skip() -> bool {
         if crate::document_arabic_font().is_none() {
-            eprintln!("skipping the Arabic shaping checks: built without a craft-fonts Arab face (set RECTO_FONTS_DIR)");
+            eprintln!("skipping the Arabic shaping checks: built without a bundled Arabic face (set RECTO_FONTS_DIR)");
             assert_eq!(shape_arabic("ب", true), Err(GlyphError::NoFont));
             assert_eq!(arabic_glyph(1).map(|_| ()), Err(GlyphError::NoFont));
             assert!(!arabic_has('ب'));
@@ -274,7 +274,7 @@ mod hebrew_tests {
     #[test]
     fn hebrew_runs_are_drawn_from_their_last_letter_with_points_on_their_letter() {
         if crate::document_hebrew_font(false).is_none() {
-            eprintln!("skipping the Hebrew shaping checks: built without a craft-fonts Hebr face (set RECTO_FONTS_DIR)");
+            eprintln!("skipping the Hebrew shaping checks: built without a bundled Hebrew face (set RECTO_FONTS_DIR)");
             assert_eq!(shape_hebrew("ש", true), Err(GlyphError::NoFont));
             assert!(!hebrew_has('ש'));
             return;

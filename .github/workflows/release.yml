@@ -53,10 +53,14 @@ jobs:
           $VERSION = "${env:GITHUB_REF_NAME}" -replace '^v', ''
           if (-not $VERSION) { $VERSION = "0.14.0" }
 
+          ./packaging/windows/test-font-notices.ps1
+          . ./packaging/windows/font-notices.ps1
+          Copy-RectoFontNotices $PWD.Path (Join-Path $PWD.Path 'target/font-licences')
           iscc "/DMyAppVersion=$VERSION" packaging/windows/setup.iss
 
           New-Item -ItemType Directory -Force -Path dist-windows
           Copy-Item target/release/recto.exe dist-windows/
+          Copy-Item target/font-licences/*.txt dist-windows/
           7z a -tzip Recto-windows-x64.zip ./dist-windows/*
 
       - name: Package Linux archive
@@ -65,6 +69,8 @@ jobs:
           mkdir -p dist-linux/bin
           cp target/release/recto dist-linux/bin/
           chmod +x dist-linux/bin/*
+          . packaging/font-notices.sh
+          copy_font_licences dist-linux/share/doc/recto
           tar -czvf Recto-linux-x64.tar.gz -C dist-linux .
 
       - name: Package macOS application bundle
@@ -98,6 +104,9 @@ jobs:
             fi
           done
           
+          . packaging/font-notices.sh
+          copy_font_licences "$APP/Contents/Resources"
+
           codesign --force --options runtime --entitlements packaging/macos/entitlements.plist --deep --sign - "$APP"
           ditto -c -k --keepParent "$APP" "Recto-macos-arm64.zip"
 

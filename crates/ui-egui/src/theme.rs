@@ -253,13 +253,13 @@ fn installed_fallback_need(cjk: CjkPreference, has_embedded_hans: bool) -> crate
 ///
 /// - In a Simplified Chinese interface built without an embedded `Hans` face (#826), it is a
 ///   Simplified Chinese system face (Microsoft YaHei, PingFang SC, …), placed before the Japanese
-///   craft-fonts faces: they lack hundreds of the catalog's characters (欢, 导, 签, …), and one
+///   bundled font faces: they lack hundreds of the catalog's characters (欢, 导, 签, …), and one
 ///   line drawn from two faces with different vertical metrics would not sit on one baseline.
 /// - A Traditional Chinese interface always uses an installed `Hant` face before the Japanese
 ///   faces, even when a Simplified-only `Hans` face is embedded: that face cannot supply
 ///   Traditional-only characters (說, 體, …).
 /// - Otherwise it is the last fallback of every family (an Arabic file name in a build without
-///   craft-fonts).
+///   bundled fonts).
 ///
 /// Installed Devanagari, Telugu, Sinhala, Tamil, Hebrew and Hangul faces, when there are, end
 /// every family just before that one, so Hindi, Telugu (#1531), Sinhala and Tamil (#1688) and
@@ -305,8 +305,8 @@ pub fn installed_font_definitions(cjk: CjkPreference) -> FontDefinitions {
 }
 
 /// The interface fonts: Inter (and JetBrains Mono for code) first, then egui's defaults, then
-/// the CJK, Arabic, Telugu, Hebrew and Thai faces of the optional craft-fonts build input as the
-/// last fallback in every family. Without craft-fonts there is no Japanese, Chinese, Arabic,
+/// the CJK, Arabic, Telugu, Hebrew and Thai faces of the local embedded font assets as the
+/// last fallback in every family. Without bundled fonts there is no Japanese, Chinese, Arabic,
 /// Telugu, Hebrew or Thai face here.
 pub fn font_definitions() -> FontDefinitions {
     font_definitions_for(false)

@@ -37,6 +37,22 @@ try {
     $actual = @(Get-CraftFontNotices $CraftFontsRoot $true)
     Write-Output "Verified $($actual.Count) notices from the actual native manifests"
   }
+  $repo = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
+  $oldRoot = $env:RECTO_FONTS_DIR
+  try {
+    Remove-Item Env:RECTO_FONTS_DIR -ErrorAction SilentlyContinue
+    $dest = Join-Path $fixture 'staged'
+    Copy-RectoFontNotices $repo $dest
+    foreach ($notice in Get-ChildItem (Join-Path $repo 'crates/fonts/assets/fonts/*/OFL.txt')) {
+      $copy = Join-Path $dest "OFL-$($notice.Directory.Name).txt"
+      if ((Get-FileHash $copy).Hash -ne (Get-FileHash $notice.FullName).Hash) { throw "Changed notice: $copy" }
+    }
+    foreach ($notice in Get-ChildItem (Join-Path $repo 'assets/fonts/OFL-*.txt')) {
+      if ((Get-FileHash (Join-Path $dest $notice.Name)).Hash -ne (Get-FileHash $notice.FullName).Hash) { throw "Changed base notice: $($notice.Name)" }
+    }
+  } finally {
+    if ($null -eq $oldRoot) { Remove-Item Env:RECTO_FONTS_DIR -ErrorAction SilentlyContinue } else { $env:RECTO_FONTS_DIR = $oldRoot }
+  }
   Write-Output 'Font notice regression checks passed'
 } finally {
   Remove-Item -LiteralPath $fixture -Recurse -Force

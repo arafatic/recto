@@ -1,10 +1,6 @@
-//! Embeds the fonts of the optional craft-fonts build input (`RECTO_FONTS_DIR`) as `RECTO_FONTS`.
-//! The recipe is craft-fonts' `docs/integration.md`; unset, `RECTO_FONTS` is empty. It only reads
-//! the local checkout (no network). On wasm32 it embeds only the UI faces (BIZ UDPGothic Regular
-//! and any `Arab`, `Telu`, `Hebr`, `Thai` or `Deva` face), to keep the web build within hosting
-//! limits (Cloudflare Pages: 25 MiB per file). Native builds also read the optional
-//! `fonts/simplified-chinese-manifest.txt` (LXGW WenKai Lite); it is never embedded on wasm.
-//! `RECTO_FONTS_REQUIRED` makes both the checkout and that native manifest required.
+//! Embeds bundled fonts from `assets/`, or the `RECTO_FONTS_DIR` override, without network access.
+//! Wasm embeds only the selected UI faces to stay within hosting size limits. Native builds also
+//! read `fonts/simplified-chinese-manifest.txt`; `RECTO_FONTS_REQUIRED` makes that manifest required.
 
 use std::fmt::Write as _;
 use std::path::PathBuf;
@@ -12,7 +8,7 @@ use std::path::PathBuf;
 #[path = "src/cjk_scripts.rs"]
 mod cjk_scripts;
 
-/// Build-script entry point: embed craft-fonts from `RECTO_FONTS_DIR`, make a missing or invalid input fatal
+/// Build-script entry point: embed bundled fonts from `RECTO_FONTS_DIR`, make a missing or invalid input fatal
 /// when `RECTO_FONTS_REQUIRED` is set, and write `embedded_fonts.rs` to `OUT_DIR`.
 fn main() {
     println!("cargo::rerun-if-env-changed=RECTO_FONTS_DIR");

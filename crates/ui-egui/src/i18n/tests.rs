@@ -323,7 +323,7 @@ fn signature_appearance_labels_keep_their_separator() {
     }
 }
 
-/// With craft-fonts, every Japanese translation has glyphs: with all interface faces (desktop)
+/// With bundled fonts, every Japanese translation has glyphs: with all interface faces (desktop)
 /// and with BIZ UDPGothic Regular alone (the web build's only Japanese face).
 #[test]
 fn japanese_labels_have_glyphs() {
@@ -504,8 +504,8 @@ fn contextual_labels_fall_back_to_the_plain_translation() {
     assert_eq!(tr_ctx(es, "no such context", "Type"), tr(es, "Type"));
 }
 
-/// With a craft-fonts Telugu face, every Telugu translation has glyphs: with all interface
-/// faces (desktop) and with the Telugu face as the only craft-fonts face (the web build keeps
+/// With a bundled Telugu face, every Telugu translation has glyphs: with all interface
+/// faces (desktop) and with the Telugu face as the only bundled font face (the web build keeps
 /// it; Telugu labels must not need a Japanese or Arabic face).
 #[test]
 fn telugu_labels_have_glyphs() {
@@ -1077,8 +1077,8 @@ fn persian_is_registered_and_persists() {
     assert_eq!(restored.language, "fa");
 }
 
-/// With a craft-fonts Arabic face, every Arabic translation has glyphs: with all interface
-/// faces (desktop) and with the Arabic face as the only craft-fonts face (the web build keeps
+/// With a bundled Arabic face, every Arabic translation has glyphs: with all interface
+/// faces (desktop) and with the Arabic face as the only bundled font face (the web build keeps
 /// it; Arabic labels must not need a Japanese face).
 #[test]
 fn arabic_labels_have_glyphs() {

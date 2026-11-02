@@ -36,7 +36,7 @@ It also holds the embedded fonts stored locally under `crates/fonts/assets/fonts
 - `ui_hebrew_fonts` / `document_hebrew_font(bold)`: the `Hebr` faces (Noto Sans Hebrew) for
   Hebrew interface text, and the face whose outlines become the Type 3 fallback for Hebrew text
   written by Edit text (Bold when asked for and present, else Regular). `None` without a
-  craft-fonts input that has one; the editor then reports a clear error.
+  font directory override that has one; the editor then reports a clear error.
 - `shape_hebrew` / `hebrew_has`: the Regular `Hebr` face shaped with harfrust for Hebrew Add
   Text content, one cluster per letter with its points and cantillation marks (positioned by the
   face), drawn by the same Type 3 writer as Arabic and Thai. `GlyphError::NoFont` without the face.

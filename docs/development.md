@@ -169,3 +169,13 @@ Relative includes resolve beside the config that contains them. Included directo
 digit-prefixed `*.conf` files, in lexical order; backups and disabled files are ignored. The scan
 limits each config to 1 MiB, visits at most 256 config files/directories, and bounds include depth
 to 16 and directory entries to 32,768. Cyclic includes are skipped.
+
+Font packaging uses the same default assets directory and `RECTO_FONTS_DIR` override as
+`crates/fonts/build.rs`. When packaging existing binaries, supply the same override used to
+build them; unset it for a normal build using tracked assets. Packages always include the
+base-font OFL notices and all declared supplemental family notices, including their copyright
+and reserved-name text. `-BuiltWithoutCraftFonts` is a deprecated Windows compatibility switch
+and never suppresses notices. No external font repository is needed.
+
+Validate notice staging with `bash packaging/test-font-notices.sh` on macOS/Linux and
+`pwsh -NoProfile -File packaging/windows/test-font-notices.ps1` on Windows.

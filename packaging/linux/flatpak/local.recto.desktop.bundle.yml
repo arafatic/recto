@@ -47,7 +47,7 @@ modules:
       - install -Dm644 share/metainfo/local.recto.desktop.metainfo.xml /app/share/metainfo/local.recto.desktop.metainfo.xml
       # OCR models (with their licences), found at /app/bin/../share/recto/models.
       - mkdir -p /app/share/recto && cp -R share/recto/models /app/share/recto/
-      # Licences, including the embedded craft-fonts' OFL texts.
+      # Licences, including the embedded fonts' OFL texts.
       - mkdir -p /app/share/icons /app/share/doc && cp -R share/icons/hicolor /app/share/icons/ && cp -R share/doc/recto /app/share/doc/
     sources:
       - type: dir

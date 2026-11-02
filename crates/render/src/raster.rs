@@ -92,10 +92,10 @@ impl RenderConfig {
     }
 }
 
-/// A Japanese face from craft-fonts for a CID font of the Adobe-Japan1 collection that the PDF
+/// A Japanese face from bundled fonts for a CID font of the Adobe-Japan1 collection that the PDF
 /// doesn't embed (`HeiseiMin-W3`, `KozGoPro-Medium`, …). hayro's own substitutes for fonts that
 /// aren't embedded are the Latin standard 14, so such text drew nothing. `None` for every other
-/// font, and when Recto was built without craft-fonts. Only Japanese: no other CJK face is
+/// font, and when Recto was built without bundled fonts. Only Japanese: no other CJK face is
 /// embedded whole.
 fn japanese_fallback(query: &FontQuery) -> Option<(FontData, u32)> {
     let FontQuery::Fallback(f) = query else { return None };

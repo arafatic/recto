@@ -71,17 +71,8 @@ copy_docs() {
   return
 }
 
-# Builds made with the optional craft-fonts input (RECTO_FONTS_DIR, set for every release) embed
-# its fonts, so the package carries their licences: fonts/<family>/OFL.txt -> OFL-<family>.txt.
-copy_font_licences() {
-  local dest="$1" f family
-  [[ -n "${RECTO_FONTS_DIR:-}" ]] || return 0
-  for f in "$RECTO_FONTS_DIR"/fonts/*/OFL.txt; do
-    [[ -f "$f" ]] || continue
-    family="$(basename "$(dirname "$f")")"
-    cp "$f" "$dest/OFL-$family.txt"
-  done
-}
+# Font notices use the same local-default/explicit-override resolution as build.rs.
+. "$ROOT/packaging/font-notices.sh"
 
 # Fetch the OCR models into a package directory (#103): `cargo xtask models DEST` downloads every
 # ATTRIBUTION.toml `kind = "model"` file, verified by SHA-256, with its licence text and an
