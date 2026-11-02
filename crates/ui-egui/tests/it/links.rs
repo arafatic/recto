@@ -1,7 +1,7 @@
 //! Recto omits upstream promotion and keeps contributor credits.
 
 use egui_kittest::Harness;
-use egui_kittest::kittest::Queryable;
+use egui_kittest::kittest::{NodeT, Queryable};
 use recto_engine::links;
 use recto_ui_egui::{Dialog, RectoApp};
 
@@ -19,7 +19,8 @@ fn harness(setup: impl FnOnce(&mut RectoApp) + 'static) -> Harness<'static, Rect
 #[test]
 fn workspace_has_no_promotional_links() {
     let h = harness(|_| {});
-    assert!(h.query_all_by_label("Recto").count() >= 1);
+    assert_eq!(h.root().accesskit_node().label().as_deref(), Some("Recto"));
+    h.get_by_label("Welcome to Recto");
     for label in ["Discord", "Join our Discord", "Join the community", "LegacySuite"] {
         assert!(h.query_by_label(label).is_none(), "{label}");
     }

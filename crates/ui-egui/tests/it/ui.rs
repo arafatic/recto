@@ -34,7 +34,8 @@ fn harness(setup: impl FnOnce(&mut RectoApp) + 'static) -> Harness<'static, Rect
 #[test]
 fn home_shows_welcome_and_tools() {
     let h = harness(|_| {});
-    assert!(h.query_all_by_label("Recto").count() >= 1);
+    assert_eq!(h.root().accesskit_node().label().as_deref(), Some("Recto"));
+    h.get_by_label("Welcome to Recto");
     for label in ["Open PDF", "Edit PDF", "Merge PDFs", "Convert", "Compress PDF"] {
         assert!(h.query_all_by_label(label).count() >= 1, "{label}");
     }
@@ -240,7 +241,8 @@ fn another_tab_coming_forward_puts_the_expanded_all_tools_away() {
     h.state_mut().set_option("home", "").unwrap();
     h.run_steps(3);
     assert!(!h.state().all_tools_full);
-    assert!(h.query_all_by_label("Recto").count() >= 1);
+    assert_eq!(h.root().accesskit_node().label().as_deref(), Some("Recto"));
+    h.get_by_label("Welcome to Recto");
     // Another document's tab.
     let mut h = harness(|app| {
         app.open_bytes("one.pdf", None, FIXTURE.to_vec()).expect("fixture opens");
@@ -260,7 +262,8 @@ fn going_home_with_no_document_puts_the_expanded_all_tools_away() {
     h.state_mut().set_option("home", "").unwrap();
     h.run_steps(3);
     assert!(!h.state().all_tools_full);
-    assert!(h.query_all_by_label("Recto").count() >= 1);
+    assert_eq!(h.root().accesskit_node().label().as_deref(), Some("Recto"));
+    h.get_by_label("Welcome to Recto");
 }
 
 #[test]
@@ -1402,7 +1405,8 @@ fn closing_the_last_active_tab_selects_the_previous_one_then_home() {
         assert!(app.session.get(ids[removed]).is_none());
     }
     assert_eq!(h.state().active, None);
-    assert!(h.query_all_by_label("Recto").count() >= 1);
+    assert_eq!(h.root().accesskit_node().label().as_deref(), Some("Recto"));
+    h.get_by_label("Welcome to Recto");
 }
 
 #[test]

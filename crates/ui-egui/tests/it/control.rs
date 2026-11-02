@@ -1017,17 +1017,23 @@ fn preferences_menu_and_shortcut_allow_switching_interface_languages() {
     }
     let (mut h, c) = harness();
     ok(&mut h, &c, "ui.set", json!({ "key": "language", "value": "ja" }));
-    // The menu bar's Edit menu holds Preferences. Titles and rows carry their mnemonic
-    // ("編集(E)", "環境設定(P)…"), so match by the start of the label.
+    // The platform layout puts Settings in the macOS app menu and Preferences in Edit
+    // on Linux/Windows. Match prefixes so menu mnemonics and ellipses remain allowed.
+    let (menu, preferences) = if cfg!(target_os = "macos") {
+        ("Recto", recto_ui_egui::i18n::tr(recto_ui_egui::i18n::Lang::from_pref("ja"), "Settings…"))
+    } else {
+        ("編集", "環境設定")
+    };
     let menu_row = |text: &'static str| {
         move |n: &egui_kittest::kittest::AccessKitNode<'_>| {
             n.role() == egui::accesskit::Role::MenuItem && n.label().is_some_and(|l| l.starts_with(text))
         }
     };
-    h.get_by(menu_row("編集")).click();
+    h.get_by(menu_row(menu)).click();
     h.run_steps(2);
-    h.get_by(menu_row("環境設定")).click();
+    h.get_by(menu_row(preferences)).click();
     h.run_steps(2);
+    assert_eq!(h.state().dialog, Some(recto_ui_egui::Dialog::Preferences));
     for (current, next, code) in [("日本語", "English", "en"), ("English", "Українська", "uk"), ("Українська", "日本語", "ja")]
     {
         let selector = ok(&mut h, &c, "ui.inspect", json!({ "query": current }));
@@ -1098,8 +1104,8 @@ fn japanese_dialogs_errors_and_custom_action_names() {
 }
 
 #[test]
-fn simplified_chinese_about_tabs_and_credit_controls() {
-    if crate::support::skip_without_glyphs("simplified_chinese_about_tabs_and_credit_controls", "zh-hans", "") {
+fn simplified_chinese_about_content_and_close_preserve_document_state() {
+    if crate::support::skip_without_glyphs("simplified_chinese_about_content_and_close_preserve_document_state", "zh-hans", "") {
         return;
     }
     let (mut h, c) = harness();
@@ -1108,24 +1114,19 @@ fn simplified_chinese_about_tabs_and_credit_controls() {
     settle(&mut h);
     ok(&mut h, &c, "ui.set", json!({"key": "dialog", "value": "about"}));
     settle(&mut h);
-    for label in ["关于", "贡献者", "模型"] {
+    assert_eq!(h.state().dialog, Some(recto_ui_egui::Dialog::About));
+    // Recto's About dialog has static credits, not the legacy contributor/model tables.
+    let version = format!("版本{}", recto_engine::build_info::version());
+    for label in ["Recto", version.as_str(), "贡献者", "用 Rust 从零编写的开源 PDF 应用。MIT OR Apache-2.0 许可。"] {
         let found = ok(&mut h, &c, "ui.inspect", json!({"query": label}));
-        assert!(found["widgets"].as_array().unwrap().iter().any(|w| w["label"] == label), "{found}");
+        assert!(found["widgets"].as_array().unwrap().iter().any(|w| w["label"] == label || w["value"] == label), "{label}: {found}");
     }
-    ok(&mut h, &c, "ui.click", json!({"label": "贡献者"}));
-    for label in ["用户名", "显示名称", "真实姓名", "排序", "名称列表", "表格", "首次提交"] {
-        let found = ok(&mut h, &c, "ui.inspect", json!({"query": label}));
-        assert!(found["count"].as_u64().unwrap() > 0, "{label}: {found}");
-    }
-    ok(&mut h, &c, "ui.click", json!({"label": "表格"}));
-    for label in ["新增行", "删除行", "净增行", "新增资源", "删除资源"] {
-        let found = ok(&mut h, &c, "ui.inspect", json!({"query": label}));
-        assert!(found["count"].as_u64().unwrap() > 0, "{label}: {found}");
-    }
-    ok(&mut h, &c, "ui.click", json!({"label": "模型"}));
-    let columns = ok(&mut h, &c, "ui.inspect", json!({"query": "占全部提交的比例"}));
-    let empty = ok(&mut h, &c, "ui.inspect", json!({"query": "此版本未包含模型贡献记录。"}));
-    assert!(columns["count"].as_u64().unwrap() > 0 || empty["count"].as_u64().unwrap() > 0, "{columns}, {empty}");
+    let close = ok(&mut h, &c, "ui.inspect", json!({"query": "关闭", "role": "Button"}));
+    assert!(close["widgets"].as_array().unwrap().iter().any(|w| w["label"] == "关闭" && w["enabled"] == true), "{close}");
+    assert_eq!(ok(&mut h, &c, "ui.state", json!({}))["documents"], documents);
+    ok(&mut h, &c, "ui.click", json!({"label": "关闭"}));
+    settle(&mut h);
+    assert_eq!(h.state().dialog, None);
     assert_eq!(ok(&mut h, &c, "ui.state", json!({}))["documents"], documents);
 }
 
