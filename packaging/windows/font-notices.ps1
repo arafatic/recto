@@ -46,3 +46,14 @@ function Assert-CraftFontNoticeNames([string[]] $Expected, [string[]] $Actual) {
     if ($name -notin $names) { throw "The MSI is missing staged font notice: $name" }
   }
 }
+
+# Stage base fonts and every declared supplemental family; preserve complete notice bytes.
+function Copy-RectoFontNotices([string] $RepoRoot, [string] $Destination) {
+  $fontRoot = if (Test-Path Env:RECTO_FONTS_DIR) { $env:RECTO_FONTS_DIR } else { Join-Path $RepoRoot 'crates/fonts/assets' }
+  if ($fontRoot -eq '') { $fontRoot = '.' }
+  New-Item -ItemType Directory -Force -Path $Destination | Out-Null
+  Copy-Item (Join-Path $RepoRoot 'assets/fonts/OFL-*.txt') $Destination
+  foreach ($notice in @(Get-CraftFontNotices $fontRoot (Test-Path Env:RECTO_FONTS_REQUIRED))) {
+    Copy-Item -LiteralPath $notice.FullName -Destination (Join-Path $Destination "OFL-$($notice.Directory.Name).txt")
+  }
+}

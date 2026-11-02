@@ -284,12 +284,12 @@ pub(crate) fn no_fallback_font(text: &str) -> EditError {
     EditError::Invalid(format!(
         "the paragraph's font has no glyph for {ch} (U+{:04X}) and this build has no fallback font for it; \
          choose a font that has it (Load font… or Installed fonts…), or use an official release, which includes \
-         Recto's fallback fonts (to build them in, set RECTO_FONTS_DIR to a craft-fonts checkout)",
+         Recto's fallback fonts (to build them in, set RECTO_FONTS_DIR to font assets directory)",
         u32::from(ch)
     ))
 }
 
-/// The character the craft-fonts Japanese faces are for: kana, CJK ideographs and their compatibility
+/// The character the bundled fonts Japanese faces are for: kana, CJK ideographs and their compatibility
 /// and full-width forms.
 fn needs_japanese(ch: char) -> bool {
     matches!(u32::from(ch), 0x3000..=0x30FF | 0x3400..=0x4DBF | 0x4E00..=0x9FFF | 0xF900..=0xFAFF | 0xFF00..=0xFFEF)
@@ -305,7 +305,7 @@ pub(crate) fn no_glyph_for(face: &EmbeddedFont, ch: char) -> EditError {
     EditError::Invalid(format!(
         "the {} fallback font has no glyph for {ch} (U+{:04X}), and no fallback face covers the text; \
          choose a font that has it (Load font… or Installed fonts…), or use an official release, which includes \
-         Recto's fallback fonts (to build them in, set RECTO_FONTS_DIR to a craft-fonts checkout)",
+         Recto's fallback fonts (to build them in, set RECTO_FONTS_DIR to font assets directory)",
         face.family,
         u32::from(ch)
     ))
@@ -315,7 +315,7 @@ pub(crate) fn no_glyph_for(face: &EmbeddedFont, ch: char) -> EditError {
 pub(super) fn no_japanese_font() -> EditError {
     EditError::Invalid(
         "this text needs Recto's Japanese fallback font, which this build doesn't include \
-         (official releases do; to build it in, set RECTO_FONTS_DIR to a craft-fonts checkout)"
+         (official releases do; to build it in, set RECTO_FONTS_DIR to font assets directory)"
             .into(),
     )
 }
@@ -329,7 +329,7 @@ pub(crate) fn fallback_face<'a>(faces: &[&'a EmbeddedFont], chars: &[char], has_
 fn no_hebrew_font() -> EditError {
     EditError::Invalid(
         "this text needs Recto's Hebrew fallback font (Noto Sans Hebrew), which this build doesn't include \
-         (to build it in, set RECTO_FONTS_DIR to a craft-fonts checkout that has it)"
+         (to build it in, set RECTO_FONTS_DIR to font assets directory that has it)"
             .into(),
     )
 }

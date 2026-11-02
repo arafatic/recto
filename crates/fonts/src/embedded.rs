@@ -28,8 +28,8 @@ impl EmbeddedFont {
     }
 }
 
-/// The `Jpan` craft-fonts faces in the order the interface prefers them: BIZ UDPGothic (a UI
-/// face) first, then the rest in manifest order. Empty without craft-fonts.
+/// The `Jpan` bundled font faces in the order the interface prefers them: BIZ UDPGothic (a UI
+/// face) first, then the rest in manifest order. Empty without bundled fonts.
 pub fn ui_japanese_fonts() -> Vec<&'static EmbeddedFont> {
     let mut fonts: Vec<&EmbeddedFont> = RECTO_FONTS.iter().filter(|f| f.covers("Jpan")).collect();
     // Stable: manifest order within each group.
@@ -37,21 +37,21 @@ pub fn ui_japanese_fonts() -> Vec<&'static EmbeddedFont> {
     fonts
 }
 
-/// The `Hans` craft-fonts faces for Simplified Chinese interface text, in manifest order.
-/// Empty when built without craft-fonts (Chinese text then shows the font system's
-/// replacement glyph, the same degraded mode as Japanese without craft-fonts).
+/// The `Hans` bundled font faces for Simplified Chinese interface text, in manifest order.
+/// Empty when built without bundled fonts (Chinese text then shows the font system's
+/// replacement glyph, the same degraded mode as Japanese without bundled fonts).
 pub fn ui_chinese_fonts() -> Vec<&'static EmbeddedFont> {
     RECTO_FONTS.iter().filter(|f| f.covers("Hans")).collect()
 }
 
-/// The `Arab` craft-fonts faces for Arabic-script interface text (file names, document titles),
-/// in manifest order. Empty when built without craft-fonts or when it has no Arabic face.
+/// The `Arab` bundled font faces for Arabic-script interface text (file names, document titles),
+/// in manifest order. Empty when built without bundled fonts or when it has no Arabic face.
 pub fn ui_arabic_fonts() -> Vec<&'static EmbeddedFont> {
     arabic(RECTO_FONTS.iter())
 }
 
 /// The face for Arabic text written into PDFs: the first `Arab` face. `None` when built without
-/// craft-fonts or when its revision has no Arabic face.
+/// bundled fonts or when its revision has no Arabic face.
 pub fn document_arabic_font() -> Option<&'static EmbeddedFont> {
     ui_arabic_fonts().into_iter().next()
 }
@@ -60,8 +60,8 @@ fn arabic<'a>(faces: impl IntoIterator<Item = &'a EmbeddedFont>) -> Vec<&'a Embe
     faces.into_iter().filter(|f| f.covers("Arab")).collect()
 }
 
-/// The `Telu` craft-fonts faces for Telugu interface text (the Telugu catalog, file names,
-/// document titles), in manifest order. Empty when built without craft-fonts or when it has no
+/// The `Telu` bundled font faces for Telugu interface text (the Telugu catalog, file names,
+/// document titles), in manifest order. Empty when built without bundled fonts or when it has no
 /// Telugu face.
 pub fn ui_telugu_fonts() -> Vec<&'static EmbeddedFont> {
     RECTO_FONTS.iter().filter(|f| f.covers("Telu")).collect()
@@ -76,8 +76,8 @@ pub fn document_thai_font() -> Option<&'static EmbeddedFont> {
     ui_thai_fonts().into_iter().next()
 }
 
-/// The `Deva` craft-fonts faces for Devanagari interface text (the Hindi catalog, file names,
-/// document titles), in manifest order. Empty when built without craft-fonts or when its revision
+/// The `Deva` bundled font faces for Devanagari interface text (the Hindi catalog, file names,
+/// document titles), in manifest order. Empty when built without bundled fonts or when its revision
 /// has no Devanagari face; a desktop build then falls back to one font already installed on the
 /// machine (`SYSTEM_DEVANAGARI_FALLBACK`), and the web build shows replacement boxes.
 pub fn ui_devanagari_fonts() -> Vec<&'static EmbeddedFont> {
@@ -85,20 +85,20 @@ pub fn ui_devanagari_fonts() -> Vec<&'static EmbeddedFont> {
 }
 
 /// The face for Devanagari text written into PDFs: the first `Deva` face. `None` when built
-/// without craft-fonts or when its revision has no Devanagari face.
+/// without bundled fonts or when its revision has no Devanagari face.
 pub fn document_devanagari_font() -> Option<&'static EmbeddedFont> {
     ui_devanagari_fonts().into_iter().next()
 }
 
-/// The `Hebr` craft-fonts faces for Hebrew interface text (file names, document titles, text
-/// being edited), in manifest order. Empty when built without craft-fonts or when it has no
+/// The `Hebr` bundled font faces for Hebrew interface text (file names, document titles, text
+/// being edited), in manifest order. Empty when built without bundled fonts or when it has no
 /// Hebrew face.
 pub fn ui_hebrew_fonts() -> Vec<&'static EmbeddedFont> {
     RECTO_FONTS.iter().filter(|f| f.covers("Hebr")).collect()
 }
 
 /// The face for Hebrew text written into PDFs: the `Hebr` face of the asked weight, else its
-/// Regular, else any `Hebr` face. `None` without craft-fonts or without a Hebrew face.
+/// Regular, else any `Hebr` face. `None` without bundled fonts or without a Hebrew face.
 pub fn document_hebrew_font(bold: bool) -> Option<&'static EmbeddedFont> {
     hebrew_face(RECTO_FONTS, bold)
 }
@@ -132,7 +132,7 @@ fn order_cjk<'a>(faces: impl IntoIterator<Item = &'a EmbeddedFont>, prefer_hans:
 }
 
 /// The face for Japanese text written into PDFs (serif document text): Shippori Mincho, then
-/// BIZ UDMincho, then any other regular `Jpan` face. `None` without craft-fonts.
+/// BIZ UDMincho, then any other regular `Jpan` face. `None` without bundled fonts.
 pub fn document_japanese_font() -> Option<&'static EmbeddedFont> {
     document_face(RECTO_FONTS, true, false)
 }
@@ -140,7 +140,7 @@ pub fn document_japanese_font() -> Option<&'static EmbeddedFont> {
 /// A real Japanese document face matching serif/sans and weight where available.
 /// Sans text prefers BIZ UDPGothic Bold or Regular. Missing weights fall back to Regular;
 /// serif text keeps the document Mincho preference. No synthetic weight or slant is applied.
-/// `None` without craft-fonts. The small web input currently has only Gothic Regular.
+/// `None` without bundled fonts. The small web input currently has only Gothic Regular.
 pub fn document_japanese_font_for_style(serif: bool, bold: bool) -> Option<&'static EmbeddedFont> {
     document_face(RECTO_FONTS, serif, bold)
 }
@@ -148,7 +148,7 @@ pub fn document_japanese_font_for_style(serif: bool, bold: bool) -> Option<&'sta
 /// Every `Jpan` face that can stand in for the document text, the best match for the style first
 /// (the face [`document_japanese_font_for_style`] returns), then the others. Not every face has
 /// every glyph (their coverage of e.g. Cyrillic differs), so a caller can move on to the next one.
-/// Empty without craft-fonts.
+/// Empty without bundled fonts.
 pub fn document_japanese_fonts_for_style(serif: bool, bold: bool) -> Vec<&'static EmbeddedFont> {
     document_faces(RECTO_FONTS, serif, bold)
 }
@@ -157,7 +157,7 @@ pub fn document_japanese_fonts_for_style(serif: bool, bold: bool) -> Vec<&'stati
 static LATIN_SCRIPTS: &[&str] = &["Latn", "Cyrl", "Grek"];
 
 /// The bundled Latin document faces (`assets/fonts`, OFL): every build has them, unlike
-/// craft-fonts. The Japanese faces carry only part of the Cyrillic (`привет` yes, Uzbek `қизил`
+/// bundled fonts. The Japanese faces carry only part of the Cyrillic (`привет` yes, Uzbek `қизил`
 /// and Kazakh `әже` no), so letters like қ, ғ, ҳ, ә, ө, ү, ұ and һ have no face at all without
 /// these.
 static INTER_REGULAR_FACE: EmbeddedFont =
@@ -222,8 +222,8 @@ const fn find(family: &str, style: &str) -> Option<&'static [u8]> {
     None
 }
 
-/// Shippori Mincho Regular from craft-fonts, the preferred face for Japanese document text.
-/// `None` when Recto was built without craft-fonts.
+/// Shippori Mincho Regular from bundled fonts, the preferred face for Japanese document text.
+/// `None` when Recto was built without bundled fonts.
 pub static SHIPPORI_MINCHO: Option<&[u8]> = find("Shippori Mincho", "Regular");
 
 #[cfg(test)]
@@ -317,13 +317,13 @@ mod tests {
 
     /// `build.rs` embeds the Japanese CJK faces whole and any other CJK face only up to
     /// `MAX_OTHER_CJK_BYTES` (the explicitly pinned native-only LXGW UI fallback has a separate
-    /// 16 MiB cap), so a checkout with a large Chinese or Korean face (craft-fonts has the
-    /// 16.4 MB Noto Sans CJK SC) leaves it out. The four Japanese faces of the pinned craft-fonts
+    /// 16 MiB cap), so a checkout with a large Chinese or Korean face (bundled fonts has the
+    /// 16.4 MB Noto Sans CJK SC) leaves it out. The four Japanese faces of the pinned bundled fonts
     /// are 24.1 MB.
     #[test]
     fn cjk_faces_follow_the_size_rule() {
         use crate::cjk_scripts::{MAX_NATIVE_UI_CJK_BYTES, MAX_OTHER_CJK_BYTES, NATIVE_UI_CJK_FAMILIES, WHOLE_CJK_FAMILIES, is_cjk_script};
-        // A tag can carry a region after the code: craft-fonts tags Noto Sans HK UI `Hant-HK`.
+        // A tag can carry a region after the code: bundled fonts tags Noto Sans HK UI `Hant-HK`.
         assert!(["Hant-HK", "Hans", "Jpan", "Hang"].iter().all(|s| is_cjk_script(s)));
         assert!(!["Latn", "Arab", "Hebr"].iter().any(|s| is_cjk_script(s)));
         let cjk = RECTO_FONTS.iter().filter(|f| f.scripts.iter().any(|s| is_cjk_script(s)));
@@ -339,7 +339,7 @@ mod tests {
         assert!(bytes < 25_000_000, "{bytes} bytes of Japanese faces");
     }
 
-    /// The bundled Inter faces carry the Latin, Greek and Cyrillic letters the craft-fonts faces
+    /// The bundled Inter faces carry the Latin, Greek and Cyrillic letters the bundled font faces
     /// lack: Uzbek қ ғ ҳ, Kazakh ә ө ү ұ һ, Ukrainian ї є ґ, Greek. This one runs with or without
     /// RECTO_FONTS_DIR (#2593).
     #[test]
@@ -363,7 +363,7 @@ mod tests {
         let ui_zh = ui_chinese_fonts();
         assert_eq!(ui_zh.len(), RECTO_FONTS.iter().filter(|f| f.covers("Hans")).count());
         if RECTO_FONTS.is_empty() {
-            eprintln!("built without craft-fonts (RECTO_FONTS_DIR unset): no Japanese faces, as expected");
+            eprintln!("built without bundled fonts (no matching local font assets): no Japanese faces, as expected");
             assert!(SHIPPORI_MINCHO.is_none() && ui.is_empty() && ui_zh.is_empty());
             return;
         }

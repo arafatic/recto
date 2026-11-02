@@ -1083,7 +1083,7 @@ fn added_arabic_text_is_shaped_in_display_order_and_stays_searchable() {
     let text =
         AddedText { rect: [72.0, 600.0, 400.0, 700.0], text: "مرحبا World".into(), size: 14.0, align: Align::Right, ..AddedText::default() };
     if recto_fonts::document_arabic_font().is_none() {
-        eprintln!("skipping the Arabic drawing checks: built without a craft-fonts Arab face (set RECTO_FONTS_DIR)");
+        eprintln!("skipping the Arabic drawing checks: built without a bundled Arabic face (set RECTO_FONTS_DIR)");
         let err = add_content(&mut doc, 0, &Content::Text(text)).unwrap_err();
         assert!(matches!(&err, EditError::Invalid(m) if m.contains("RECTO_FONTS_DIR")), "{err:?}");
         assert!(!doc.is_modified(), "nothing is written when the font is missing");
@@ -1134,7 +1134,7 @@ fn added_hebrew_text_is_drawn_right_to_left_and_stays_searchable() {
         ..AddedText::default()
     };
     if recto_fonts::document_hebrew_font(false).is_none() {
-        eprintln!("skipping the Hebrew drawing checks: built without a craft-fonts Hebr face (set RECTO_FONTS_DIR)");
+        eprintln!("skipping the Hebrew drawing checks: built without a bundled Hebrew face (set RECTO_FONTS_DIR)");
         assert_eq!(first_undrawable(&text), Some('ש'));
         let err = add_content(&mut doc, 0, &Content::Text(text)).unwrap_err();
         assert!(matches!(&err, EditError::Invalid(m) if m.contains("U+05E9")), "{err:?}");
@@ -1435,12 +1435,12 @@ fn descriptor_text_page() -> Document {
     Document::open(Arc::new(out)).unwrap()
 }
 
-/// The Japanese fallback face comes from craft-fonts, an optional build input.
+/// The Japanese fallback face comes from bundled fonts, an optional build input.
 fn without_craft_fonts(test: &str) -> bool {
     if recto_fonts::document_japanese_font().is_some() {
         return false;
     }
-    eprintln!("skipping {test}: built without craft-fonts (set RECTO_FONTS_DIR to run it)");
+    eprintln!("skipping {test}: built without bundled fonts (set RECTO_FONTS_DIR to run it)");
     true
 }
 
@@ -1592,9 +1592,9 @@ fn cyrillic_in_a_serif_line_falls_back_to_a_face_that_has_it() {
     }
 }
 
-/// #2593: the craft-fonts faces are Japanese, and part of the Cyrillic (Uzbek қ ғ ҳ, Kazakh ә ө ү
+/// #2593: the bundled font faces are Japanese, and part of the Cyrillic (Uzbek қ ғ ҳ, Kazakh ә ө ү
 /// ұ һ) is in none of them. The bundled Inter face has it, so the replacement is written instead of
-/// being refused, and a build without craft-fonts can do it too.
+/// being refused, and a build without bundled fonts can do it too.
 #[test]
 fn uzbek_and_kazakh_cyrillic_use_the_bundled_latin_face() {
     for replacement in ["The quick brown fox jumps over the lazy dog қизил", "әже", "ўзбекча ғўза"] {
@@ -1642,8 +1642,8 @@ fn japanese_paragraph_uses_unicode_type3_fallback() {
     assert_eq!(text::text_blocks(&reopened, 0).unwrap()[0].text, replacement);
 }
 
-/// The first `n` Japanese characters, in code point order, that every craft-fonts face can draw, so
-/// whichever face an edit picks has them all. Without craft-fonts there are no faces, every character
+/// The first `n` Japanese characters, in code point order, that every bundled font face can draw, so
+/// whichever face an edit picks has them all. Without bundled fonts there are no faces, every character
 /// passes, and the text is still long.
 fn covered_japanese_chars(n: usize) -> String {
     let faces = recto_fonts::document_japanese_fonts_for_style(false, false);
@@ -1722,7 +1722,7 @@ fn rewriting_japanese_twice_keeps_only_the_fallback_fonts_it_shows() {
     let mut doc = text_page("BT /F1 12 Tf 72 700 Td (Hello) Tj ET");
     if text::rewrite_block(&mut doc, 0, 0, Some("日本語の文章"), &text::BlockStyle::default()).is_err() {
         assert!(recto_fonts::document_japanese_font().is_none());
-        eprintln!("built without a craft-fonts Japanese face: the Type 3 path is checked with RECTO_FONTS_DIR");
+        eprintln!("built without a bundled Japanese face: the Type 3 path is checked with RECTO_FONTS_DIR");
         return;
     }
     let first: Vec<_> = fallback_fonts(&doc).into_iter().map(|(_, f)| f).collect();
@@ -1756,7 +1756,7 @@ fn japanese_replacement_over_240_unique_glyphs_is_split_across_fallback_fonts() 
     let replacement = covered_japanese_chars(300);
     let mut doc = text_page("BT /F2 12 Tf 72 700 Td (ab) Tj ET");
     if without_craft_fonts("japanese_replacement_over_240_unique_glyphs_is_split_across_fallback_fonts") {
-        // Without craft-fonts the long text gets the clear error, not the old limit message.
+        // Without bundled fonts the long text gets the clear error, not the old limit message.
         let err = text::replace_line(&mut doc, 0, 0, &replacement).unwrap_err().to_string();
         assert!(err.contains("RECTO_FONTS_DIR"), "{err}");
         return;
@@ -2193,7 +2193,7 @@ fn japanese_paragraph_keeps_ideographic_spaces() {
     assert_eq!(text::text_lines(&reopen(&doc), 0).unwrap()[0].text, replacement);
 }
 
-/// Without craft-fonts there is no Japanese face: editing in Japanese is a clear error that
+/// Without bundled fonts there is no Japanese face: editing in Japanese is a clear error that
 /// leaves the page untouched, never a panic; Latin edits work as before.
 #[test]
 fn japanese_edit_without_craft_fonts_is_a_clear_error() {
@@ -2202,7 +2202,7 @@ fn japanese_edit_without_craft_fonts_is_a_clear_error() {
     let line = text::replace_line(&mut doc, 0, 0, "日本語の文字");
     let block = text::replace_block(&mut doc, 0, 0, "日本語の文字");
     if recto_fonts::document_japanese_font().is_some() {
-        eprintln!("built with craft-fonts: the Japanese edits succeed (checked by the tests above)");
+        eprintln!("built with bundled fonts: the Japanese edits succeed (checked by the tests above)");
         assert!(line.is_ok() && block.is_ok());
         return;
     }
@@ -2710,7 +2710,7 @@ fn missing_glyphs_substitute_helvetica_and_impossible_text_is_refused() {
     let doc2 = reopen(&doc);
     let lines = text::text_lines(&doc2, 0).unwrap();
     assert_eq!((lines[0].text.as_str(), lines[0].base_font.as_str()), ("abc", "Helvetica"));
-    // Neither the standard font nor the craft-fonts Japanese faces have this emoji.
+    // Neither the standard font nor the bundled fonts Japanese faces have this emoji.
     let mut doc = text_page("BT /F1 12 Tf 72 700 Td (Hello) Tj ET");
     assert!(text::replace_line(&mut doc, 0, 0, "\u{1f4a9}").is_err());
     assert!(text::replace_line(&mut doc, 0, 5, "x").is_err(), "no such line");
@@ -3615,7 +3615,7 @@ fn justified_text_in_the_type3_fallback_stretches_its_spaces() {
     let rewritten = text::rewrite_block(&mut doc, 0, 0, Some(typed), &style);
     if recto_fonts::document_japanese_font().is_none() {
         assert!(rewritten.is_err());
-        eprintln!("built without a craft-fonts Japanese face: the Type 3 path is checked with RECTO_FONTS_DIR");
+        eprintln!("built without a bundled Japanese face: the Type 3 path is checked with RECTO_FONTS_DIR");
         return;
     }
     rewritten.unwrap();
@@ -3629,7 +3629,7 @@ fn justified_text_in_the_type3_fallback_stretches_its_spaces() {
     assert!(ops.iter().filter(|o| o.is("Tw")).all(|o| o.operands.first().and_then(|n| n.as_f64()) == Some(0.0)), "{ops:?}");
 }
 
-/// Letters the page's font lacks are drawn with the Hebrew face from craft-fonts; a build
+/// Letters the page's font lacks are drawn with the Hebrew face from bundled fonts; a build
 /// without it says so and changes nothing. Hebrew points are refused, not misdrawn.
 #[test]
 fn hebrew_letters_the_page_font_lacks_use_the_hebrew_face() {
@@ -3647,7 +3647,7 @@ fn hebrew_letters_the_page_font_lacks_use_the_hebrew_face() {
         let Err(EditError::Invalid(msg)) = line else { panic!("expected a clear error, got {line:?}") };
         assert!(msg.contains("Hebrew fallback font") && msg.contains("RECTO_FONTS_DIR"), "{msg}");
         assert_eq!(page_content_bytes(&doc, 0), before);
-        eprintln!("built without a craft-fonts Hebrew face: the Type 3 path is checked with RECTO_FONTS_DIR");
+        eprintln!("built without a bundled Hebrew face: the Type 3 path is checked with RECTO_FONTS_DIR");
         return;
     }
     assert_eq!(line.unwrap().substituted.as_deref(), Some("Noto Sans Hebrew Type3"));
@@ -3742,7 +3742,7 @@ fn page_text_the_standard_fonts_cant_draw_is_refused() {
     };
     add_header_footer(&mut doc, &[0], &hf("Left\r\n<<Bates Number#6#1#ACME-#>>"), true, &cx()).unwrap();
     assert!(add_header_footer(&mut doc, &[0], &hf("A\rB"), true, &cx()).unwrap_err().to_string().contains("U+000D"));
-    // Arabic is shaped with the craft-fonts Arabic face (#403): drawable when that face is built
+    // Arabic is shaped with the bundled fonts Arabic face (#403): drawable when that face is built
     // in, refused (never written as `?`) when it isn't. Text left to the standard font still counts.
     let arabic = |text: &str| AddedText { rect: [72.0, 600.0, 300.0, 700.0], text: text.into(), ..AddedText::default() };
     // U+061C is in the Arabic block but is a direction mark that's dropped, not shaped: it never
@@ -5767,7 +5767,7 @@ fn a_subset_program_is_not_trusted_for_new_characters_and_the_error_names_the_ch
     let mut doc = embedded_program_page("BT /F1 12 Tf 72 700 Td (Stable text) Tj ET", "ABCDEF+Inter-Regular");
     // The subset's own program is not trusted for a character: a fallback face draws it through a
     // generated font instead (the subset may map a code whose outline was dropped). The Japanese
-    // sans face leads the fallbacks when built with craft-fonts; the bundled Inter face otherwise.
+    // sans face leads the fallbacks when built with bundled fonts; the bundled Inter face otherwise.
     let edit = text::rewrite_block(&mut doc, 0, 0, Some("Stable tőxt"), &text::BlockStyle::default()).unwrap();
     let face = recto_fonts::document_japanese_font_for_style(false, false).map_or("Inter", |f| f.family);
     assert_eq!(edit.substituted, Some(format!("{face} Type3")));
@@ -5813,7 +5813,7 @@ fn draft_layout_matches_the_paragraph_an_applied_edit_draws() {
 #[test]
 fn japanese_paragraphs_wrap_between_characters_without_closing_marks_at_a_row_start() {
     if recto_fonts::document_japanese_font().is_none() {
-        eprintln!("skipping the Japanese wrapping checks: built without craft-fonts (set RECTO_FONTS_DIR)");
+        eprintln!("skipping the Japanese wrapping checks: built without bundled fonts (set RECTO_FONTS_DIR)");
         return;
     }
     let text = "日本語の文章は単語の間に空白がないので、どの文字の間でも行を折り返せます。ただし「句読点」や小さい「っ」は行頭に来ません。";

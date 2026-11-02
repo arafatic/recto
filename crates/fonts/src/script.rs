@@ -1,4 +1,4 @@
-//! Typed signatures and bounded glyph outlines from approved fonts (bundled, or craft-fonts).
+//! Typed signatures and bounded glyph outlines from approved fonts (bundled, or bundled fonts).
 
 use skrifa::instance::{LocationRef, Size};
 use skrifa::outline::{DrawSettings, OutlinePen};
@@ -48,7 +48,7 @@ pub struct GlyphOutline {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum GlyphError {
-    /// This build has no Japanese face: it was built without craft-fonts (`RECTO_FONTS_DIR`).
+    /// This build has no Japanese face: it was built without the required local font assets.
     NoFont,
     Missing,
     TooComplex,
@@ -135,14 +135,14 @@ impl OutlinePen for Flatten {
 }
 
 /// Return one glyph of the Japanese document face ([`crate::document_japanese_font`], Shippori
-/// Mincho from craft-fonts), bounded so hostile replacement text cannot allocate unbounded
+/// Mincho from bundled fonts), bounded so hostile replacement text cannot allocate unbounded
 /// outline data. [`GlyphError::NoFont`] when the build has no Japanese face.
 pub fn japanese_glyph(ch: char) -> Result<GlyphOutline, GlyphError> {
     let Some(face) = crate::document_japanese_font() else { return Err(GlyphError::NoFont) };
     japanese_glyph_from(face, ch)
 }
 
-/// The bounded outline and advance from the explicitly selected craft-fonts face.
+/// The bounded outline and advance from the explicitly selected bundled font face.
 /// Uses the same complexity and missing-glyph checks as [`japanese_glyph`].
 pub fn japanese_glyph_from(face: &crate::EmbeddedFont, ch: char) -> Result<GlyphOutline, GlyphError> {
     let Ok(font) = FontRef::new(face.bytes) else { return Err(GlyphError::Missing) };
@@ -318,12 +318,12 @@ mod tests {
     #[test]
     fn japanese_glyphs_come_from_craft_fonts() {
         if crate::document_japanese_font().is_none() {
-            eprintln!("skipping the glyph checks: built without craft-fonts (set RECTO_FONTS_DIR)");
+            eprintln!("skipping the glyph checks: built without bundled fonts (set RECTO_FONTS_DIR)");
             assert_eq!(super::japanese_glyph('こ'), Err(super::GlyphError::NoFont));
             return;
         }
         for ch in "日本語の文字こ".chars() {
-            let g = super::japanese_glyph(ch).expect("craft-fonts face has the Japanese glyph");
+            let g = super::japanese_glyph(ch).expect("bundled font face has the Japanese glyph");
             assert!(g.width > 0.2 && g.width < 2.0);
             assert!(!g.contours.is_empty());
         }

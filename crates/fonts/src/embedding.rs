@@ -1,5 +1,5 @@
 //! Unicode embedding of an explicitly supplied, embeddable TrueType face. Font files are
-//! document inputs or the optional craft-fonts build input, never system-interface fallbacks.
+//! document inputs or the local embedded font assets, never system-interface fallbacks.
 
 use std::collections::HashMap;
 use std::fmt::Write as _;

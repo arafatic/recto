@@ -74,14 +74,14 @@ pub fn outside_menus<'h>(h: &'h Harness<'static, RectoApp>, label: &str) -> egui
 
 /// Whether the test `name` must skip because the interface fonts lack a glyph for a character it
 /// draws: one in `text` or in the catalog of the interface `language`. egui 0.37 test harnesses
-/// panic on a missing glyph, and Japanese, Chinese and Thai faces come only from the optional
-/// craft-fonts build input or a face installed on this machine. Prints the skip line.
+/// panic on a missing glyph, and Japanese, Chinese and Thai faces come from the
+/// local font inventory or a face installed on this machine. Prints the skip line.
 ///
 /// The fonts are those the app installs for `language` and for the default CJK preference: a
 /// switch to Chinese installs its fonts for the next frame, so the first frame in Chinese draws
 /// with the fonts of the language before it.
 ///
-/// A build that requires craft-fonts (`RECTO_FONTS_REQUIRED=1`, as the CI gate sets) never skips:
+/// A build that requires bundled fonts (`RECTO_FONTS_REQUIRED=1`, when strict font validation is requested) never skips:
 /// a missing glyph there is a failure.
 pub fn skip_without_glyphs(name: &str, language: &str, text: &str) -> bool {
     if std::env::var("RECTO_FONTS_REQUIRED").as_deref() == Ok("1") {
@@ -100,6 +100,6 @@ pub fn skip_without_glyphs(name: &str, language: &str, text: &str) -> bool {
     let Some(missing) = missing else {
         return false;
     };
-    eprintln!("skipping {name}: no interface font draws {missing:?} (set RECTO_FONTS_DIR to a craft-fonts checkout with a face for it)");
+    eprintln!("skipping {name}: no interface font draws {missing:?} (set RECTO_FONTS_DIR to font assets directory with a face for it)");
     true
 }

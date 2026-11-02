@@ -19,8 +19,8 @@
 //! 1. The document embeds the program. Nothing is substituted.
 //! 2. `/BaseFont` names one of the standard 14 (or a well-known alias such as Arial). Exact
 //!    published metrics apply, so this is as close to right as a substitution gets.
-//! 3. craft-fonts holds that exact family. Never another family — see [`crate::embedding`].
-//! 4. The descendant font's `/CIDSystemInfo /Ordering` names a script, and craft-fonts has a face
+//! 3. the bundled inventory holds that exact family. Never another family — see [`crate::embedding`].
+//! 4. The descendant font's `/CIDSystemInfo /Ordering` names a script, and bundled fonts has a face
 //!    for it. Today that means Adobe-Japan1.
 //! 5. The ordering names a script we have **no** licensed face for (GB1, CNS1, Korea1). There is
 //!    no honest substitute, so the chain reports none: the caller draws nothing and can say why.
@@ -52,7 +52,7 @@ pub enum Face {
     Embedded,
     /// One of the standard 14, whose metrics are exact.
     Standard14(Std14),
-    /// A face from the optional craft-fonts build input.
+    /// A face from the local embedded font assets.
     Craft(&'static EmbeddedFont),
     /// No face at all. The caller must draw nothing rather than draw the wrong glyphs.
     None,
@@ -63,7 +63,7 @@ impl PartialEq for Face {
         match (self, other) {
             (Self::Embedded, Self::Embedded) | (Self::None, Self::None) => true,
             (Self::Standard14(a), Self::Standard14(b)) => a == b,
-            // craft-fonts entries are unique statics, so identity is the comparison that means
+            // bundled font entries are unique statics, so identity is the comparison that means
             // what we want: two styles of one family are different faces and must not be equal.
             (Self::Craft(a), Self::Craft(b)) => std::ptr::eq(*a, *b),
             _ => false,
@@ -95,9 +95,9 @@ pub enum Why {
     /// `/BaseFont` is otherwise unknown, but its name hints at a family ("Serif", "Roman",
     /// "Mono"). A guess from the name, and reported as one.
     NameHintedStandard14,
-    /// craft-fonts holds this exact family.
+    /// the bundled inventory holds this exact family.
     ExactCraftFamily,
-    /// A craft-fonts face for the script named by `/CIDSystemInfo /Ordering`.
+    /// A bundled font face for the script named by `/CIDSystemInfo /Ordering`.
     ScriptFace,
     /// The ordering names a script with no licensed face available.
     NoFaceForScript,
@@ -149,14 +149,14 @@ impl Substitution {
     }
 }
 
-/// CID orderings we recognise, and whether a craft-fonts face may exist for them.
+/// CID orderings we recognise, and whether a bundled font face may exist for them.
 ///
 /// `Identity` is not a script: it says the codes are glyph ids, so it tells us nothing about
 /// which face would suit and the chain falls through to the flags.
 fn script_for(ordering: &str) -> Option<&'static str> {
     match ordering {
         "Japan1" => Some("Jpan"),
-        // Registered orderings the chain maps to no craft-fonts face.
+        // Registered orderings the chain maps to no bundled font face.
         "GB1" | "CNS1" | "Korea1" | "KR" => Some(""),
         _ => None,
     }
@@ -316,7 +316,7 @@ mod tests {
 
     #[test]
     fn japanese_depends_on_craft_fonts_and_says_which_it_got() {
-        // craft-fonts is an optional build input, so both outcomes are correct -- but they must be
+        // the font inventory can be overridden, so both outcomes are correct -- but they must be
         // distinguishable, and neither may be a silent Latin stand-in.
         let s = substitute(&req("SomeJapaneseFont", false, 0, Some("Japan1")));
         if crate::RECTO_FONTS.iter().any(|f| f.covers("Jpan")) {

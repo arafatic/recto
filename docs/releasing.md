@@ -154,15 +154,16 @@ neither the MSI nor the portable zip needs the Visual C++ redistributable.
   embedded font family, and `portable.txt`. That marker beside `recto.exe` keeps the
   settings, logs, crash recovery and new digital IDs in `RectoData\` next to the exe instead of
   `%APPDATA%` and `%LOCALAPPDATA%` (`crates/ui-egui/src/platform/portable.rs`). The MSI carries the same
-  OFL notices; `-SkipBuild` reads local font assets or `RECTO_FONTS_DIR` so they can be staged, or
-  `-BuiltWithoutCraftFonts` for binaries built without that input, and `test-msi.ps1` checks that
-  the compiled MSI has OFL notice rows when expected (and none for a no-font build).
+  OFL notices; `-SkipBuild` stages notices from the local assets by default, or from the same
+  `RECTO_FONTS_DIR` override used to build the existing binaries. `-BuiltWithoutCraftFonts` is
+  deprecated and never suppresses notices. `test-msi.ps1` checks that the compiled MSI includes
+  every staged font notice.
   Before either package is created, `font-notices.ps1` validates every declared OFL notice in
-  `fonts/manifest.txt` and the native `fonts/simplified-chinese-manifest.txt` when present
+  `crates/fonts/assets/fonts/manifest.txt` and the native `crates/fonts/assets/fonts/simplified-chinese-manifest.txt` when present
   (required when `RECTO_FONTS_REQUIRED` is set). Missing or empty family notices fail packaging;
   one family's notice cannot cover another. The check conservatively includes declared faces
   omitted by build-time size caps. `test-font-notices.ps1` exercises these failures in CI.
-  The supplied checkout must match the existing binaries when using `-SkipBuild`.
+  The selected font assets directory must match the existing binaries when using `-SkipBuild`.
   That presence check does not establish byte-for-byte payload or installation coverage;
   final package qualification still checks all notices against the staged files.
 - **Signing:** `packaging/windows/sign.ps1` signs both executables and the MSI with `signtool`

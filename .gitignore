@@ -7,7 +7,7 @@ plan/
 .DS_Store
 /fuzz-out
 /assets/models
-# A craft-fonts checkout used as the optional RECTO_FONTS_DIR build input (CI and releases put it here).
+# Legacy optional font checkout; builds and releases use tracked local assets by default.
 /craft-fonts
 *.app
 *.zip

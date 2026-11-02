@@ -6,7 +6,7 @@
 #>
 param(
   [Parameter(Mandatory)] [string] $Path,
-  # 1 when package.ps1 staged craft-fonts OFL notices, 0 when the binaries embed no craft-fonts.
+  # 1 when package.ps1 staged font notices, 0 for legacy packages without notices.
   # -1 (the default) skips the check when the MSI is inspected by hand.
   [int] $CraftFontLicences = -1,
   [string] $ExpectedFontNoticesDirectory
@@ -46,7 +46,7 @@ $Installer.UILevel = 2
 $manufacturer = Read-Row 'SELECT `Value` FROM `Property` WHERE `Property` = ''Manufacturer''' 1
 Assert-Equal $manufacturer[0] 'Learning Machines LLC' 'MSI manufacturer'
 
-# Embedded craft-fonts must ship their OFL notices; a build without them must not claim any.
+# Embedded fonts must ship their complete OFL notices.
 # Check the compiled File table, not only the WiX source, so a staging or component-group mistake
 # cannot silently omit the licences.
 $fontNotices = @()

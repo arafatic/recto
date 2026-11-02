@@ -46,6 +46,8 @@ Source: "..\..\LICENSE-MIT"; DestDir: "{app}"; Flags: ignoreversion skipifsource
 Source: "..\..\LICENSE-APACHE"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "..\..\README.md"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 
+Source: "..\..\target\font-licences\OFL-*.txt"; DestDir: "{app}"; Flags: ignoreversion
+
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\recto.ico"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"

@@ -25,7 +25,7 @@ completes its subsets automatically, including new Chinese characters. When the 
 the complete program of a paragraph's font (not a subset) and its licence allows editable
 embedding, a character the font's encoding can't show is drawn with that same program. A
 character no available face has is refused with an error that names it, and a CJK character
-without a craft-fonts build says so. Replacement text takes the craft-fonts Japanese faces when
+without the required bundled fonts says so. Replacement text takes the bundled Japanese faces when
 they can draw all of it, and the bundled Inter face (`assets/fonts`) for the Latin, Greek and
 Cyrillic letters they lack (Uzbek `қизил`, Kazakh `әже`): that face needs no build input, so
 these work in every build, the web one included. Choosing another face
@@ -42,7 +42,7 @@ Original subset bytes are
 preserved. Optional matching faces from `RECTO_FONTS_DIR` can also complete source subsets;
 this works only when that build input actually contains the full face. This change does not
 add a font binary or change the release font pin. Fonts shared by releases belong in
-`arafatic/craft-fonts` under the repository's asset rules.
+`crates/fonts/assets/fonts/`, with their upstream provenance and complete license notices.
 
 When mixed-style text needs outline fallback, characters using the same actual fallback face
 share Type 3 fonts, with at most 240 distinct glyphs per font. Adjacent characters with the same
