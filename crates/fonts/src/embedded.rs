@@ -1,10 +1,11 @@
-//! Fonts from the optional craft-fonts build input (<https://github.com/arafatic/craft-fonts>).
+//! Embedded font assets for Recto (`crates/fonts/assets/fonts/`).
 //!
-//! `build.rs` embeds every font in craft-fonts' manifest when Recto is built with
-//! `RECTO_FONTS_DIR=<checkout>`; otherwise [`RECTO_FONTS`] is empty and everything here returns
-//! nothing. Callers must work either way.
+//! `build.rs` embeds fonts from the local `crates/fonts/assets/` directory or from
+//! `RECTO_FONTS_DIR=<path>` when specified.
+//!
+//! Callers handle empty or missing font subsets gracefully.
 
-/// A font from the optional craft-fonts build input (empty unless built with `RECTO_FONTS_DIR`).
+/// An embedded font asset.
 pub struct EmbeddedFont {
     pub family: &'static str,
     pub style: &'static str,

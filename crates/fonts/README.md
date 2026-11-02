@@ -19,10 +19,10 @@ Today it holds what generated appearances need without a font program:
   `set_undrawn_mark` (`UNDRAWN_MARK`, read back by `undrawn_mark`) so the edit is reported and
   flattening refuses. `script_missing` names what the typed-signature script font and its Inter fallback both lack.
 
-It also holds the fonts of the optional [craft-fonts](https://github.com/arafatic/craft-fonts)
-build input. `build.rs` embeds them as `RECTO_FONTS` when the build sets
-`RECTO_FONTS_DIR=<checkout>` (and fails if it can't while `RECTO_FONTS_REQUIRED=1`, as releases
-set). Without that variable `RECTO_FONTS` is empty and everything below copes:
+It also holds the embedded fonts stored locally under `crates/fonts/assets/fonts/`.
+`build.rs` embeds them as `RECTO_FONTS` automatically from the local assets directory
+(or from `RECTO_FONTS_DIR=<path>` when overridden). Without available font assets,
+`RECTO_FONTS` is empty and everything below copes:
 
 - `ui_japanese_fonts`: the `Jpan` faces for the interface, BIZ UDPGothic first.
 - `ui_chinese_fonts`: the `Hans` faces for the interface, in manifest order (without one,
@@ -71,7 +71,7 @@ needed.
 
 wasm32 builds embed only BIZ UDPGothic Regular and any `Arab`, `Telu`, `Hebr` or `Thai` face, to keep the web build small: the web build
 currently has no Chinese face, so Chinese there still shows the replacement glyph.
-Font files are never committed directly to this repository.
+Font files are stored locally under `crates/fonts/assets/fonts/`.
 
 The full font subsystem (parsing, shaping, subsetting and embedding) arrives with M2.2/M7.
 

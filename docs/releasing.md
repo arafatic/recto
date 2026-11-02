@@ -64,10 +64,7 @@ The workflow sets `RECTO_BUILD_SHA` and `RECTO_BUILD_DATE` (`packaging/env.sh` f
 for local builds): the commit is recorded in the macOS `Info.plist` (`RectoBuildCommit`) and the
 date in the AppStream metadata. The binaries don't embed the commit yet.
 
-**Fonts:** every job checks out [craft-fonts](https://github.com/arafatic/craft-fonts) at the commit
-pinned in `release.yml` and builds with `RECTO_FONTS_DIR` and `RECTO_FONTS_REQUIRED=1`, so releases
-embed its Japanese fonts and fail rather than ship without them (`AGENTS.md` §1.4). Bump the pin
-deliberately.
+**Fonts:** builds embed font assets from `crates/fonts/assets/fonts/` (or from `RECTO_FONTS_DIR` when overridden), embedding Japanese and other international fallback fonts directly. Packaging stages the OFL notices of embedded font families.
 
 **OCR models:** desktop packaging stages the Scan & OCR models (#103).
 The packaging scripts call `stage_models` (`packaging/env.sh`; `package.ps1` on Windows), which runs `cargo xtask models` to fetch every `kind = "model"` file in `ATTRIBUTION.toml` and verify its SHA-256.
@@ -154,10 +151,10 @@ neither the MSI nor the portable zip needs the Visual C++ redistributable.
   smoke test checks that both all-users shortcuts point at the installed `recto.exe` and are
   removed on uninstall, and that `INSTALLDESKTOPSHORTCUT=0` skips the desktop one.
 - The portable zip holds both executables, the README, the licences, the OFL licence of each
-  embedded craft-fonts family, and `portable.txt`. That marker beside `recto.exe` keeps the
+  embedded font family, and `portable.txt`. That marker beside `recto.exe` keeps the
   settings, logs, crash recovery and new digital IDs in `RectoData\` next to the exe instead of
   `%APPDATA%` and `%LOCALAPPDATA%` (`crates/ui-egui/src/platform/portable.rs`). The MSI carries the same
-  OFL notices; `-SkipBuild` requires `RECTO_FONTS_DIR` so they can be staged, or
+  OFL notices; `-SkipBuild` reads local font assets or `RECTO_FONTS_DIR` so they can be staged, or
   `-BuiltWithoutCraftFonts` for binaries built without that input, and `test-msi.ps1` checks that
   the compiled MSI has OFL notice rows when expected (and none for a no-font build).
   Before either package is created, `font-notices.ps1` validates every declared OFL notice in

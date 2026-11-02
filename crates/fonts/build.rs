@@ -19,14 +19,18 @@ fn main() {
     println!("cargo::rerun-if-env-changed=RECTO_FONTS_REQUIRED");
     let mut src = String::from("pub static RECTO_FONTS: &[EmbeddedFont] = &[\n");
     let required = std::env::var_os("RECTO_FONTS_REQUIRED").is_some();
-    if let Some(dir) = std::env::var_os("RECTO_FONTS_DIR").map(PathBuf::from) {
+    let local_assets = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap_or_default()).join("assets");
+    let dir = std::env::var_os("RECTO_FONTS_DIR")
+        .map(PathBuf::from)
+        .or_else(|| if local_assets.join("fonts/manifest.txt").is_file() { Some(local_assets) } else { None });
+    if let Some(dir) = dir {
         match craft_fonts(&dir, required) {
             Ok(entries) => src.push_str(&entries),
-            Err(e) if required => println!("cargo::error=RECTO_FONTS_DIR={}: {e}", dir.display()),
-            Err(e) => println!("cargo::warning=building without craft-fonts: RECTO_FONTS_DIR={}: {e}", dir.display()),
+            Err(e) if required => println!("cargo::error=font directory {}: {e}", dir.display()),
+            Err(e) => println!("cargo::warning=building without font assets: {}: {e}", dir.display()),
         }
     } else if required {
-        println!("cargo::error=RECTO_FONTS_REQUIRED is set but RECTO_FONTS_DIR is missing");
+        println!("cargo::error=RECTO_FONTS_REQUIRED is set but no font directory was found");
     }
     src.push_str("];\n");
     let out = PathBuf::from(std::env::var_os("OUT_DIR").unwrap_or_default()).join("embedded_fonts.rs");

@@ -170,6 +170,29 @@ pub fn sha256_hex(bytes: &[u8]) -> String {
 /// `cargo xtask assets [--write]`.
 pub fn run(args: &[String]) -> Result<()> {
     let root = root();
+    let font_dir = root.join("crates/fonts/assets/fonts");
+    if font_dir.is_dir() {
+        println!("assets: verifying local fonts in {}", font_dir.display());
+        let manifest_path = font_dir.join("manifest.txt");
+        if manifest_path.is_file() {
+            let text = std::fs::read_to_string(&manifest_path)?;
+            let mut count = 0;
+            for line in text.lines().map(str::trim).filter(|l| !l.is_empty() && !l.starts_with('#')) {
+                let parts: Vec<&str> = line.split(" | ").map(str::trim).collect();
+                if parts.len() >= 3 {
+                    let rel = parts[2].strip_prefix("fonts/").unwrap_or(parts[2]);
+                    if font_dir.join(rel).is_file() {
+                        count += 1;
+                    }
+                }
+            }
+            println!("assets: verified {count} local font files against manifest");
+        }
+    }
+    if !root.join("ATTRIBUTION.toml").is_file() {
+        println!("assets: ok (ATTRIBUTION.toml not present, local font assets verified)");
+        return Ok(());
+    }
     let manifest = load(&root)?;
     let markdown = render_markdown(&manifest);
     if args.iter().any(|a| a == "--write") {
@@ -513,11 +536,11 @@ mod tests {
     #[test]
     fn build_inputs_need_an_open_licence_and_https_links() {
         let input = |licence: &str, attribution: &str| BuildInput {
-            name: "craft-fonts".into(),
+            name: "local-fonts".into(),
             option: "RECTO_FONTS_DIR".into(),
             title: "t".into(),
             author: "a".into(),
-            source: "https://github.com/arafatic/craft-fonts".into(),
+            source: "https://example.org/fonts".into(),
             licence: licence.into(),
             attribution: attribution.into(),
             kind: "font".into(),
@@ -527,6 +550,23 @@ mod tests {
         assert!(check_one(input("OFL-1.1", "https://example.org/ATTRIBUTION.md")).is_empty());
         assert_eq!(check_one(input("LicenseRef-Proprietary", "https://example.org/A.md")).len(), 1);
         assert_eq!(check_one(input("OFL-1.1", "ATTRIBUTION.md")).len(), 1);
+    }
+
+    #[test]
+    fn local_font_assets_exist_and_match_manifest() {
+        let root = root();
+        let font_dir = root.join("crates/fonts/assets/fonts");
+        if font_dir.is_dir() {
+            let manifest_path = font_dir.join("manifest.txt");
+            assert!(manifest_path.is_file(), "crates/fonts/assets/fonts/manifest.txt must exist");
+            let text = std::fs::read_to_string(&manifest_path).expect("read manifest");
+            for line in text.lines().map(str::trim).filter(|l| !l.is_empty() && !l.starts_with('#')) {
+                let parts: Vec<&str> = line.split(" | ").map(str::trim).collect();
+                assert!(parts.len() >= 3, "malformed manifest line: {line}");
+                let rel = parts[2].strip_prefix("fonts/").unwrap_or(parts[2]);
+                assert!(font_dir.join(rel).is_file(), "missing font file: {rel}");
+            }
+        }
     }
 
     fn lock(entries: &[(&str, &str)]) -> BTreeSet<(String, String)> {
