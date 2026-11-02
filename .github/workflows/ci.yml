@@ -35,7 +35,11 @@ jobs:
             libgl1-mesa-dri \
             mesa-vulkan-drivers \
             libvulkan1 \
-            vulkan-tools
+            vulkan-tools \
+            xvfb \
+            libfontconfig1-dev \
+            fontconfig \
+            fonts-dejavu-core
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -44,4 +48,4 @@ jobs:
         run: cargo check --workspace
 
       - name: Cargo Test
-        run: cargo test --workspace --no-fail-fast
+        run: xvfb-run --auto-servernum cargo test --workspace --no-fail-fast
