@@ -14,7 +14,7 @@ workspace = true
 recto-content = { workspace = true }
 recto-cos = { workspace = true }
 recto-model = { workspace = true }
-roxmltree = "0.20"
+roxmltree = "0.21"
 
 [dev-dependencies]
 flate2 = { workspace = true }
