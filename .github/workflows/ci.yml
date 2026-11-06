@@ -19,7 +19,7 @@ jobs:
       GALLIUM_DRIVER: "llvmpipe"
       WGPU_BACKEND: "vulkan"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install Linux dependencies and software GPU drivers
         run: |
