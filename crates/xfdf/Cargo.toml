@@ -13,5 +13,5 @@ recto-cos = { workspace = true }
 recto-annot = { workspace = true }
 recto-forms = { workspace = true }
 recto-model = { workspace = true }
-roxmltree = "0.20"
+roxmltree = "0.21"
 thiserror = { workspace = true }
